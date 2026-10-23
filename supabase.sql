@@ -1,4 +1,4 @@
--- Run once in Supabase: SQL Editor → New query → paste → Run.
+-- Run in Supabase: SQL Editor → New query → paste → Run. Safe to run more than once.
 -- One row per user holding their whole progress as JSON.
 create table if not exists public.progress (
   user_id    uuid primary key references auth.users (id) on delete cascade,
@@ -9,11 +9,15 @@ create table if not exists public.progress (
 -- Row-level security: each signed-in user can only see and change their own row.
 alter table public.progress enable row level security;
 
+drop policy if exists "read own progress" on public.progress;
 create policy "read own progress" on public.progress
   for select using (auth.uid() = user_id);
+drop policy if exists "insert own progress" on public.progress;
 create policy "insert own progress" on public.progress
   for insert with check (auth.uid() = user_id);
+drop policy if exists "update own progress" on public.progress;
 create policy "update own progress" on public.progress
   for update using (auth.uid() = user_id) with check (auth.uid() = user_id);
+drop policy if exists "delete own progress" on public.progress;
 create policy "delete own progress" on public.progress
   for delete using (auth.uid() = user_id);

@@ -20,7 +20,7 @@ img{max-width:100%}
   --ok:#0E9F66; --ok-soft:#E1F5EB; --bad:#DB4436; --bad-soft:#FDECEA;
   --boss:#D92E5B; --boss-soft:#FCE7ED; --amber:#E89A0C; --info:#2F6FEB; --info-soft:#E8F0FE;
   --code-bg:#15171C; --code-fg:#E7E9EE; --code-dim:#7B8190;
-  --shadow:0 1px 2px rgba(16,24,40,.05),0 6px 20px rgba(16,24,40,.06);
+  --shadow:0 1px 2px rgba(16,24,40,.06);
   --r:18px; --r-sm:12px;
   --f-display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
   --f-body:"Hanken Grotesk", "Segoe UI", system-ui, sans-serif;
@@ -57,17 +57,17 @@ button:focus-visible,textarea:focus-visible{outline:3px solid color-mix(in srgb,
 .top .eyebrow{color:var(--accent)}
 .hud{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;gap:12px;align-items:stretch}
 @media (max-width:720px){.hud{grid-template-columns:auto minmax(0,1fr)}}
-.lvl{--p:0;width:76px;height:76px;align-self:center;border-radius:50%;display:grid;place-items:center;position:relative;
-  background:conic-gradient(var(--accent) calc(var(--p) * 1%),var(--line) 0);border:0;box-shadow:none}
-.lvl::before{content:"";position:absolute;inset:7px;border-radius:50%;background:var(--surface)}
+.lvl{--p:0;width:76px;height:76px;align-self:center;border-radius:50%;display:grid;place-items:center;position:relative;background:var(--surface)}
+.lvl::before{content:"";position:absolute;inset:0;border-radius:50%;background:conic-gradient(var(--accent) calc(var(--p) * 1%),var(--line) 0);
+  -webkit-mask:radial-gradient(circle,transparent 30px,#000 31px);mask:radial-gradient(circle,transparent 30px,#000 31px)}
 .lvl span,.lvl b{position:relative;grid-area:1/1;line-height:1}
-.lvl span{font-size:10.5px;font-weight:600;letter-spacing:.08em;color:var(--muted);transform:translateY(-15px)}
+.lvl span{font-size:11px;font-weight:600;letter-spacing:.08em;color:var(--muted);transform:translateY(-15px)}
 .lvl b{font-family:var(--f-display);font-size:28px;font-weight:800;transform:translateY(5px);font-variant-numeric:tabular-nums}
 .xp{padding:14px 18px;display:flex;flex-direction:column;justify-content:center;gap:10px;min-width:0}
 .xp-label{display:flex;justify-content:space-between;font-size:14px;color:var(--muted);font-variant-numeric:tabular-nums}
 .xp-label b{color:var(--ink)}
 .xpbar{height:10px;background:var(--surface-2);border:1px solid var(--line);border-radius:99px;overflow:hidden}
-.xpfill{height:100%;width:0;background:var(--accent);border-radius:99px;transition:width .7s cubic-bezier(.2,.8,.2,1)}
+.xpfill{height:100%;width:100%;background:var(--accent);border-radius:99px;transform:scaleX(0);transform-origin:left;transition:transform .7s cubic-bezier(.2,.8,.2,1)}
 .stat{padding:12px 18px;display:flex;flex-direction:column;justify-content:center;min-width:108px}
 .stat b{font-family:var(--f-display);font-size:28px;font-weight:700;line-height:1.1;font-variant-numeric:tabular-nums}
 .stat span{font-size:13px;color:var(--muted)}
@@ -81,8 +81,8 @@ button:focus-visible,textarea:focus-visible{outline:3px solid color-mix(in srgb,
 .sync{font-size:13px}
 .sync::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--ok);margin-right:6px;vertical-align:1px}
 .block{display:flex;flex-direction:column;gap:14px}
-.block>h3{font-size:22px;font-weight:700;display:flex;gap:12px;align-items:baseline;flex-wrap:wrap}
-.block>h3 .eyebrow{font-family:var(--f-body)}
+.block>h2{font-size:22px;font-weight:700;display:flex;gap:12px;align-items:baseline;flex-wrap:wrap}
+.block>h2 .eyebrow{font-family:var(--f-body)}
 .review{padding:16px 18px;color:var(--muted);font-size:14.5px;margin:0}
 .review b{color:var(--ink)}
 
@@ -94,7 +94,7 @@ button:focus-visible,textarea:focus-visible{outline:3px solid color-mix(in srgb,
 .mnum{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;font-family:var(--f-display);font-weight:800;font-size:17px;background:var(--accent-soft);color:var(--accent)}
 .mcard.boss .mnum{background:var(--boss-soft);color:var(--boss)}
 .mcard.fin .mnum{background:var(--ok-soft);color:var(--ok)}
-.mcard h4{font-size:18px;font-weight:700}
+.mcard h3{font-size:18px;font-weight:700}
 .mstatus{margin:0;font-size:13.5px;color:var(--muted);flex:1}
 .mcard.fin .mstatus{color:var(--ok);font-weight:600}
 .mcard.locked{opacity:.55;box-shadow:none}
@@ -122,8 +122,8 @@ button:focus-visible,textarea:focus-visible{outline:3px solid color-mix(in srgb,
 .tile[aria-expanded="true"]{border-color:var(--ink);box-shadow:0 0 0 1px var(--ink)}
 .map-detail{padding:18px 20px;display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:16px 28px}
 @media (max-width:720px){.map-detail{grid-template-columns:1fr}}
-.map-detail h4{font-size:19px;grid-column:1 / -1;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
-.map-detail h4 span{font-family:var(--f-body);font-size:13px;color:var(--muted);font-weight:600}
+.map-detail h3{font-size:19px;grid-column:1 / -1;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.map-detail h3 span{font-family:var(--f-body);font-size:13px;color:var(--muted);font-weight:600}
 .map-detail p{margin:0}
 .map-detail .lbl{display:block;font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
 .chips{display:flex;flex-wrap:wrap;gap:6px}
@@ -195,14 +195,14 @@ button:focus-visible,textarea:focus-visible{outline:3px solid color-mix(in srgb,
 .drill{display:flex;flex-direction:column;min-width:0;overflow:hidden}
 .drill.done{border-color:var(--ok)}
 .drill-head{padding:16px 18px;display:flex;flex-direction:column;gap:6px;border-bottom:1px solid var(--line)}
-.drill-head h4{font-size:20px;font-weight:700;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.drill-head h3{font-size:20px;font-weight:700;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .drill-head p{margin:0;color:var(--muted);font-size:15px}
 .badge{font-family:var(--f-body);font-size:12px;font-weight:700;padding:2px 10px;border-radius:99px;background:var(--accent-soft);color:var(--accent);letter-spacing:0}
 .drill.done .badge{background:var(--ok-soft);color:var(--ok)}
 .drill.boss .badge{background:var(--boss-soft);color:var(--boss)}
 .boss-hp{display:flex;gap:10px;align-items:center;font-size:13px;font-weight:700;color:var(--boss)}
 .boss-hp .bar{flex:1;height:10px;border-radius:99px;background:var(--boss-soft);position:relative;overflow:hidden}
-.boss-hp .bar i{position:absolute;inset:0 auto 0 0;background:var(--boss);border-radius:99px;transition:width .6s cubic-bezier(.2,.8,.2,1)}
+.boss-hp .bar i{position:absolute;inset:0;background:var(--boss);border-radius:99px;transform-origin:left;transition:transform .6s cubic-bezier(.2,.8,.2,1)}
 .drill-body{display:grid;grid-template-columns:1fr 1fr;min-width:0}
 @media (max-width:860px){.drill-body{grid-template-columns:1fr}}
 .editor{background:var(--code-bg);display:flex;flex-direction:column;min-width:0}
@@ -246,7 +246,7 @@ button:focus-visible,textarea:focus-visible{outline:3px solid color-mix(in srgb,
 body.in-mission .title-row{display:none}
 
 /* toast + xp pop */
-.toast{position:fixed;left:50%;top:calc(20px + env(safe-area-inset-top,0px));transform:translate(-50%,calc(-100% - 60px));visibility:hidden;z-index:20;padding:12px 22px;text-align:center;background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:0 10px 40px rgba(16,24,40,.18);transition:transform .45s cubic-bezier(.2,1.3,.3,1);pointer-events:none;max-width:calc(100vw - 32px)}
+.toast{position:fixed;left:50%;top:calc(20px + env(safe-area-inset-top,0px));transform:translate(-50%,calc(-100% - 60px));visibility:hidden;z-index:20;padding:12px 22px;text-align:center;background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:0 10px 40px rgba(16,24,40,.18);transition:transform .45s cubic-bezier(.22,1,.36,1);pointer-events:none;max-width:calc(100vw - 32px)}
 .toast.show{transform:translate(-50%,0);visibility:visible}
 .toast b{display:block;font-family:var(--f-display);font-size:22px;font-weight:800;color:var(--ok)}
 .toast span{font-size:13.5px;color:var(--muted)}
@@ -366,11 +366,11 @@ body.in-mission .title-row{display:none}
   </div>
 
   <section class="block">
-    <h3>Missions <span class="eyebrow">Week 1 · each one unlocks the next</span></h3>
+    <h2>Missions <span class="eyebrow">Week 1 · each one unlocks the next</span></h2>
     <div class="missions" id="missions"></div>
   </section>
   <section class="block">
-    <h3>Road map <span class="eyebrow">3 stages · from zero to professional</span></h3>
+    <h2>Road map <span class="eyebrow">3 stages · from zero to professional</span></h2>
     <nav class="map" aria-label="Learning road map" id="map"></nav>
   </section>
 
@@ -1162,7 +1162,7 @@ function stats(){
   document.getElementById("sLvl").textContent = lvl;
   document.getElementById("sXp").textContent = x % PER_LEVEL;
   document.getElementById("sNext").textContent = PER_LEVEL;
-  document.getElementById("sFill").style.width = ((x % PER_LEVEL)/PER_LEVEL*100)+"%";
+  document.getElementById("sFill").style.transform = "scaleX("+((x % PER_LEVEL)/PER_LEVEL)+")";
   document.getElementById("lvlRing").style.setProperty("--p", (x % PER_LEVEL)/PER_LEVEL*100);
   document.getElementById("sStreak").textContent = streak();
   document.getElementById("sDrills").textContent = ALL_DRILLS.filter(d=>state.done[d.id]).length+"/"+ALL_DRILLS.length;
@@ -1301,7 +1301,7 @@ function renderMap(){
       if(openTile===key){
         detail.hidden = false;
         const W = si===0 ? WEEK_INFO[ii] : null;
-        detail.append(el("h4",{}, t, el("span",{}, tag+(on?" · in progress":" · locked"))));
+        detail.append(el("h3",{}, t, el("span",{}, tag+(on?" · in progress":" · locked"))));
         if(W){
           detail.append(
             el("div",{}, el("span",{class:"lbl"},"After this you can"), el("p",{}, W.can), el("span",{class:"lbl",style:"margin-top:12px"},"You'll build"), el("p",{}, W.build)),
@@ -1355,7 +1355,7 @@ function renderMissions(){
     box.append(el("article",{class:"mcard frame"+(open?"":" locked")+(fin?" fin":"")+(boss?" boss":"")},
       el("div",{class:"mnum"}, String(i+1).padStart(2,"0")),
       el("div",{class:"eyebrow"}, boss?"Boss mission":"Mission"),
-      el("h4",{}, D.title),
+      el("h3",{}, D.title),
       pips(dayDiff(i)),
       el("p",{class:"mstatus"}, status),
       el("button",{class:"btn"+(open&&!fin?" primary":""),disabled:!open,onclick:()=>openMission(i)}, !open?"Locked":fin?"Replay":started?"Continue":"Start")));
@@ -1529,7 +1529,7 @@ function renderDrill(dr, onPass){
   let file = "html";
   const isBoss = !!dr.boss;
   const card = el("article",{class:"drill frame"+(done?" done":"")+(isBoss?" boss":"")});
-  const hpFill = el("i",{style:"width:"+(done?0:100)+"%"});
+  const hpFill = el("i",{style:"transform:scaleX("+(done?0:1)+")"});
   const hp = isBoss ? el("div",{class:"boss-hp"}, el("span",{},"Boss HP"), el("div",{class:"bar"}, hpFill)) : null;
   const ta = el("textarea",{spellcheck:"false","aria-label":dr.title+" code editor",autocapitalize:"off",autocomplete:"off"});
   ta.value = cur.html;
@@ -1559,7 +1559,7 @@ function renderDrill(dr, onPass){
     [...checks.children].forEach((li,i)=>{ li.className = res[i]?"pass":"fail"; });
     touch();
     const pass = res.every(Boolean);
-    if(isBoss) hpFill.style.width = (res.filter(x=>!x).length/res.length*100)+"%";
+    if(isBoss) hpFill.style.transform = "scaleX("+(res.filter(x=>!x).length/res.length)+")";
     if(pass && !state.done[dr.id]) toast(isBoss?"Boss defeated":"+30 XP", isBoss?"+30 XP · Week 1 boss down":dr.title+" cleared");
     if(pass){
       const first = !state.done[dr.id];
@@ -1577,7 +1577,7 @@ function renderDrill(dr, onPass){
 
   const badge = el("span",{class:"badge"}, done?"Cleared":(isBoss?"Boss":"Drill"));
   card.append(
-    el("div",{class:"drill-head"}, el("h4",{}, dr.title, badge), el("p",{}, dr.brief), hp,
+    el("div",{class:"drill-head"}, el("h3",{}, dr.title, badge), el("p",{}, dr.brief), hp,
       (dr.uses||[]).length ? el("details",{class:"refresh"}, el("summary",{},"Refresher: "+dr.uses.join(", ")),
         dr.uses.map(t=>BRIEFS[t]).filter(Boolean).map(b=>el("div",{class:"refresh-item"}, el("b",{},b.t), el("p",{},b.body), el("pre",{},b.ex)))) : null),
     el("div",{class:"drill-body"},
