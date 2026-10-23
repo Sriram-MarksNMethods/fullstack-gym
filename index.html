@@ -1,0 +1,1618 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Full-Stack Gym</title>
+<meta name="description" content="A hands-on full-stack course: lessons, try-its, questions and auto-checked coding drills.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Hanken+Grotesk:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0}
+img{max-width:100%}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+/* Layout: a calm learning app. A base screen (level ring, missions, road map) and
+   one focused card per mission step. Light by default, a matching dark theme. */
+:root{
+  --bg:#F3F4F6; --surface:#FFFFFF; --surface-2:#F7F8FA; --ink:#16181D; --muted:#626875; --line:#E3E5EA;
+  --accent:#F0641E; --accent-ink:#FFFFFF; --accent-soft:#FFEEE4;
+  --ok:#0E9F66; --ok-soft:#E1F5EB; --bad:#DB4436; --bad-soft:#FDECEA;
+  --boss:#D92E5B; --boss-soft:#FCE7ED; --amber:#E89A0C; --info:#2F6FEB; --info-soft:#E8F0FE;
+  --code-bg:#15171C; --code-fg:#E7E9EE; --code-dim:#7B8190;
+  --shadow:0 1px 2px rgba(16,24,40,.05),0 6px 20px rgba(16,24,40,.06);
+  --r:18px; --r-sm:12px;
+  --f-display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body:"Hanken Grotesk", "Segoe UI", system-ui, sans-serif;
+  --f-mono:"JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0F1013; --surface:#18191D; --surface-2:#1F2126; --ink:#ECEDEF; --muted:#9A9FAA; --line:#2A2D33;
+  --accent:#FF7A35; --accent-ink:#1A0D05; --accent-soft:#3A2419;
+  --ok:#36C98B; --ok-soft:#14291F; --bad:#FF6B5E; --bad-soft:#351B19;
+  --boss:#FF5C85; --boss-soft:#3A1823; --amber:#F5B43C; --info:#6F9BFF; --info-soft:#1A2440;
+  --code-bg:#0B0C0F; --shadow:0 1px 0 rgba(255,255,255,.03); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0F1013; --surface:#18191D; --surface-2:#1F2126; --ink:#ECEDEF; --muted:#9A9FAA; --line:#2A2D33;
+  --accent:#FF7A35; --accent-ink:#1A0D05; --accent-soft:#3A2419;
+  --ok:#36C98B; --ok-soft:#14291F; --bad:#FF6B5E; --bad-soft:#351B19;
+  --boss:#FF5C85; --boss-soft:#3A1823; --amber:#F5B43C; --info:#6F9BFF; --info-soft:#1A2440;
+  --code-bg:#0B0C0F; --shadow:0 1px 0 rgba(255,255,255,.03); color-scheme:dark}
+
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15.5px;line-height:1.6}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 72px;display:flex;flex-direction:column;gap:28px}
+h1,h2,h3,h4{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.12;letter-spacing:-.015em}
+code{font-family:var(--f-mono);font-size:.86em;background:var(--surface-2);border:1px solid var(--line);border-radius:6px;padding:1px 5px}
+button{font:inherit;cursor:pointer}
+button:focus-visible,textarea:focus-visible{outline:3px solid color-mix(in srgb,var(--accent) 45%,transparent);outline-offset:2px}
+.eyebrow{font-size:12.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.frame{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
+
+/* top */
+.top{display:flex;flex-direction:column;gap:18px}
+.title-row{display:flex;flex-wrap:wrap;gap:12px 24px;justify-content:space-between;align-items:flex-end}
+.top h1{font-size:clamp(36px,6vw,60px);font-weight:800}
+.top p{margin:6px 0 0;color:var(--muted);max-width:56ch}
+.top .eyebrow{color:var(--accent)}
+.hud{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;gap:12px;align-items:stretch}
+@media (max-width:720px){.hud{grid-template-columns:auto minmax(0,1fr)}}
+.lvl{--p:0;width:76px;height:76px;align-self:center;border-radius:50%;display:grid;place-items:center;position:relative;
+  background:conic-gradient(var(--accent) calc(var(--p) * 1%),var(--line) 0);border:0;box-shadow:none}
+.lvl::before{content:"";position:absolute;inset:7px;border-radius:50%;background:var(--surface)}
+.lvl span,.lvl b{position:relative;grid-area:1/1;line-height:1}
+.lvl span{font-size:10.5px;font-weight:600;letter-spacing:.08em;color:var(--muted);transform:translateY(-15px)}
+.lvl b{font-family:var(--f-display);font-size:28px;font-weight:800;transform:translateY(5px);font-variant-numeric:tabular-nums}
+.xp{padding:14px 18px;display:flex;flex-direction:column;justify-content:center;gap:10px;min-width:0}
+.xp-label{display:flex;justify-content:space-between;font-size:14px;color:var(--muted);font-variant-numeric:tabular-nums}
+.xp-label b{color:var(--ink)}
+.xpbar{height:10px;background:var(--surface-2);border:1px solid var(--line);border-radius:99px;overflow:hidden}
+.xpfill{height:100%;width:0;background:var(--accent);border-radius:99px;transition:width .7s cubic-bezier(.2,.8,.2,1)}
+.stat{padding:12px 18px;display:flex;flex-direction:column;justify-content:center;min-width:108px}
+.stat b{font-family:var(--f-display);font-size:28px;font-weight:700;line-height:1.1;font-variant-numeric:tabular-nums}
+.stat span{font-size:13px;color:var(--muted)}
+.stat.streak b{color:var(--amber)}
+.stat.cleared b{color:var(--ok)}
+
+/* hub */
+.hub{display:flex;flex-direction:column;gap:30px}
+.rules{display:flex;flex-wrap:wrap;gap:8px 22px;font-size:14px;color:var(--muted);padding:14px 18px}
+.rules b{color:var(--ink)}
+.sync{font-size:13px}
+.sync::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--ok);margin-right:6px;vertical-align:1px}
+.block{display:flex;flex-direction:column;gap:14px}
+.block>h3{font-size:22px;font-weight:700;display:flex;gap:12px;align-items:baseline;flex-wrap:wrap}
+.block>h3 .eyebrow{font-family:var(--f-body)}
+.review{padding:16px 18px;color:var(--muted);font-size:14.5px;margin:0}
+.review b{color:var(--ink)}
+
+.missions{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px}
+@media (max-width:1100px){.missions{grid-template-columns:repeat(2,minmax(0,1fr))}.mcard.boss{grid-column:1 / -1}}
+@media (max-width:520px){.missions{grid-template-columns:1fr}}
+.mcard{padding:18px;display:flex;flex-direction:column;gap:8px;align-items:flex-start;min-width:0;transition:transform .2s,box-shadow .2s}
+.mcard:not(.locked):hover{transform:translateY(-2px);box-shadow:0 2px 4px rgba(16,24,40,.06),0 14px 30px rgba(16,24,40,.09)}
+.mnum{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;font-family:var(--f-display);font-weight:800;font-size:17px;background:var(--accent-soft);color:var(--accent)}
+.mcard.boss .mnum{background:var(--boss-soft);color:var(--boss)}
+.mcard.fin .mnum{background:var(--ok-soft);color:var(--ok)}
+.mcard h4{font-size:18px;font-weight:700}
+.mstatus{margin:0;font-size:13.5px;color:var(--muted);flex:1}
+.mcard.fin .mstatus{color:var(--ok);font-weight:600}
+.mcard.locked{opacity:.55;box-shadow:none}
+.pips{display:inline-flex;gap:4px;align-items:center}
+.pips i{width:8px;height:8px;border-radius:50%;background:var(--line)}
+.pips i.on{background:var(--amber)}
+.pips em{font-style:normal;font-size:12.5px;font-weight:600;color:var(--muted);margin-left:4px}
+
+.map{display:flex;flex-direction:column;gap:22px}
+.stage{display:flex;flex-direction:column;gap:10px;min-width:0}
+.stage-name{display:flex;gap:12px;align-items:baseline;flex-wrap:wrap}
+.stage-name b{font-family:var(--f-display);font-size:17px;font-weight:700}
+.stage-name span{font-size:13.5px;color:var(--muted)}
+.map ol{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.map ol.n12{grid-template-columns:repeat(6,minmax(0,1fr))}
+.map ol.n8{grid-template-columns:repeat(8,minmax(0,1fr))}
+@media (min-width:2200px){.map ol.n12{grid-template-columns:repeat(12,minmax(0,1fr))}}
+@media (max-width:1100px){.map ol.n12,.map ol.n8{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media (max-width:520px){.map ol.n12,.map ol.n8{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.tile{width:100%;height:100%;text-align:left;border:1px solid var(--line);background:var(--surface);color:var(--muted);border-radius:var(--r-sm);padding:10px 12px;font-size:13px;line-height:1.35;display:flex;flex-direction:column;gap:3px;transition:border-color .15s,background .15s}
+.tile b{font-size:11.5px;font-weight:700;letter-spacing:.04em;color:var(--muted)}
+.tile:hover{border-color:var(--accent)}
+.tile.on{background:var(--accent-soft);border-color:var(--accent);color:var(--ink)}
+.tile.on b{color:var(--accent)}
+.tile[aria-expanded="true"]{border-color:var(--ink);box-shadow:0 0 0 1px var(--ink)}
+.map-detail{padding:18px 20px;display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:16px 28px}
+@media (max-width:720px){.map-detail{grid-template-columns:1fr}}
+.map-detail h4{font-size:19px;grid-column:1 / -1;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.map-detail h4 span{font-family:var(--f-body);font-size:13px;color:var(--muted);font-weight:600}
+.map-detail p{margin:0}
+.map-detail .lbl{display:block;font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips span{font-size:13px;padding:3px 10px;border-radius:99px;background:var(--surface-2);border:1px solid var(--line)}
+
+/* mission */
+.mission{display:flex;flex-direction:column;gap:22px}
+.mission-bar{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.steps{display:flex;gap:5px;flex:1;min-width:180px}
+.steps i{flex:1;height:8px;border-radius:99px;background:var(--line);transition:background .3s}
+.steps i.done{background:var(--accent)}
+.steps i.now{background:var(--ink)}
+.mission.is-boss .steps i.done{background:var(--boss)}
+.screen{display:flex;flex-direction:column;gap:18px;animation:screenIn .4s cubic-bezier(.2,.8,.2,1)}
+.screen.back{animation-name:screenBack}
+@keyframes screenIn{from{opacity:0;transform:translateX(24px)}to{opacity:1;transform:none}}
+@keyframes screenBack{from{opacity:0;transform:translateX(-24px)}to{opacity:1;transform:none}}
+.screen-head{display:flex;flex-direction:column;gap:8px;align-items:flex-start}
+.screen-head .eyebrow{color:var(--accent)}
+.mission.is-boss .screen-head .eyebrow{color:var(--boss)}
+.screen-head h2{font-size:clamp(26px,4vw,40px);font-weight:800}
+.qtag{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;padding:3px 10px;border-radius:99px;background:var(--info-soft);color:var(--info)}
+.qtag.read{background:var(--accent-soft);color:var(--accent)}
+.qtag.bug{background:var(--bad-soft);color:var(--bad)}
+.solo{max-width:780px;width:100%}
+.intro{padding:clamp(24px,6vw,60px);display:flex;flex-direction:column;gap:14px;align-items:flex-start;max-width:820px}
+.intro .eyebrow{color:var(--accent)}
+.mission.is-boss .intro .eyebrow{color:var(--boss)}
+.mnum-big{font-family:var(--f-display);font-weight:800;font-size:clamp(64px,12vw,128px);line-height:.9;color:var(--accent);letter-spacing:-.04em}
+.mission.is-boss .mnum-big{color:var(--boss)}
+.intro h2{font-size:clamp(28px,4.5vw,46px);font-weight:800}
+.intro p{margin:0;color:var(--muted);max-width:60ch;font-size:17px}
+.loadout{list-style:none;margin:6px 0 4px;padding:0;display:flex;flex-wrap:wrap;gap:8px}
+.loadout li{font-size:13.5px;padding:5px 12px;border-radius:99px;background:var(--surface-2);border:1px solid var(--line)}
+.blink::after{content:none}
+
+/* briefing */
+.brief{padding:clamp(20px,4vw,36px);display:flex;flex-direction:column;gap:16px;max-width:860px}
+.brief-body{margin:0;font-size:17px;line-height:1.65;max-width:66ch}
+.brief pre{margin:0;background:var(--code-bg);color:var(--code-fg);border-radius:var(--r-sm);padding:14px 16px;overflow-x:auto;font-family:var(--f-mono);font-size:13.5px;line-height:1.6}
+.callouts{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:720px){.callouts{grid-template-columns:1fr}}
+.callout{border-radius:var(--r-sm);padding:12px 14px;font-size:14.5px}
+.callout b{display:block;font-size:12px;letter-spacing:.05em;text-transform:uppercase;margin-bottom:3px}
+.callout.warn{background:var(--bad-soft)}
+.callout.warn b{color:var(--bad)}
+.callout.work{background:var(--ok-soft)}
+.callout.work b{color:var(--ok)}
+
+/* quiz */
+.quiz{padding:clamp(18px,3vw,28px);display:flex;flex-direction:column;gap:12px;min-width:0}
+.quiz .q{font-family:var(--f-display);font-size:clamp(18px,2.2vw,22px);font-weight:700;line-height:1.3}
+.quiz pre{margin:0;background:var(--code-bg);color:var(--code-fg);border-radius:var(--r-sm);padding:12px 14px;overflow-x:auto;font-family:var(--f-mono);font-size:13.5px}
+.opts{display:flex;flex-direction:column;gap:8px}
+.opt{position:relative;text-align:left;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:var(--r-sm);padding:12px 14px 12px 48px;font-size:15.5px;transition:border-color .15s,background .15s,transform .1s}
+.opt::before{content:attr(data-k);position:absolute;left:12px;top:50%;transform:translateY(-50%);width:24px;height:24px;border-radius:8px;display:grid;place-items:center;font-size:12px;font-weight:700;background:var(--surface-2);border:1px solid var(--line);color:var(--muted)}
+.opt:hover:not(:disabled){border-color:var(--accent)}
+.opt:active:not(:disabled){transform:scale(.99)}
+.opt.right{background:var(--ok-soft);border-color:var(--ok)}
+.opt.right::before{content:"✓";background:var(--ok);border-color:var(--ok);color:#fff}
+.opt.wrong{background:var(--bad-soft);border-color:var(--bad);animation:shake .3s}
+.opt.wrong::before{content:"✕";background:var(--bad);border-color:var(--bad);color:#fff}
+.opt:disabled{cursor:default}
+.opt:disabled:not(.right):not(.wrong){opacity:.5}
+@keyframes shake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+.why{font-size:15px;background:var(--ok-soft);border-radius:var(--r-sm);padding:12px 14px}
+
+/* drills */
+.drill{display:flex;flex-direction:column;min-width:0;overflow:hidden}
+.drill.done{border-color:var(--ok)}
+.drill-head{padding:16px 18px;display:flex;flex-direction:column;gap:6px;border-bottom:1px solid var(--line)}
+.drill-head h4{font-size:20px;font-weight:700;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.drill-head p{margin:0;color:var(--muted);font-size:15px}
+.badge{font-family:var(--f-body);font-size:12px;font-weight:700;padding:2px 10px;border-radius:99px;background:var(--accent-soft);color:var(--accent);letter-spacing:0}
+.drill.done .badge{background:var(--ok-soft);color:var(--ok)}
+.drill.boss .badge{background:var(--boss-soft);color:var(--boss)}
+.boss-hp{display:flex;gap:10px;align-items:center;font-size:13px;font-weight:700;color:var(--boss)}
+.boss-hp .bar{flex:1;height:10px;border-radius:99px;background:var(--boss-soft);position:relative;overflow:hidden}
+.boss-hp .bar i{position:absolute;inset:0 auto 0 0;background:var(--boss);border-radius:99px;transition:width .6s cubic-bezier(.2,.8,.2,1)}
+.drill-body{display:grid;grid-template-columns:1fr 1fr;min-width:0}
+@media (max-width:860px){.drill-body{grid-template-columns:1fr}}
+.editor{background:var(--code-bg);display:flex;flex-direction:column;min-width:0}
+.ftabs{display:flex;gap:4px;padding:8px 8px 0}
+.ftab{background:transparent;border:0;color:var(--code-dim);font-family:var(--f-mono);font-size:12.5px;padding:6px 12px;border-radius:8px 8px 0 0}
+.ftab[aria-selected="true"]{color:var(--code-fg);background:#ffffff12}
+.editor textarea{flex:1;min-height:260px;resize:vertical;border:0;background:transparent;color:var(--code-fg);font-family:var(--f-mono);font-size:13.5px;line-height:1.65;padding:12px 16px;tab-size:2;white-space:pre;overflow:auto;caret-color:var(--accent)}
+.editor textarea:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.preview{display:flex;flex-direction:column;min-width:0;border-left:1px solid var(--line);background:var(--surface-2)}
+@media (max-width:860px){.preview{border-left:0;border-top:1px solid var(--line)}}
+.preview .eyebrow{padding:8px 14px;font-size:11.5px}
+.preview iframe{width:100%;flex:1;min-height:260px;border:0;background:#fff}
+.drill-foot{padding:14px 18px;display:flex;flex-direction:column;gap:12px;border-top:1px solid var(--line)}
+.checks{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;font-size:14.5px}
+.checks li{display:flex;gap:10px;align-items:center;color:var(--muted)}
+.checks li::before{content:"";width:18px;height:18px;flex:none;border-radius:50%;border:2px solid var(--line);box-sizing:border-box;display:grid;place-items:center;font-size:11px;font-weight:700}
+.checks li.pass{color:var(--ink)}
+.checks li.pass::before{content:"✓";background:var(--ok);border-color:var(--ok);color:#fff}
+.checks li.fail::before{content:"✕";background:var(--bad);border-color:var(--bad);color:#fff}
+.actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.btn{border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:99px;padding:9px 18px;font-weight:700;font-size:14.5px;transition:background .15s,border-color .15s,transform .1s}
+.btn:hover:not(:disabled){border-color:var(--ink)}
+.btn:active:not(:disabled){transform:scale(.98)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.primary:hover:not(:disabled){border-color:var(--accent);filter:brightness(1.05)}
+.btn.ghost{background:transparent;border-color:transparent;color:var(--muted)}
+.btn.ghost:hover:not(:disabled){color:var(--ink);border-color:var(--line)}
+.btn.big{font-size:16.5px;padding:13px 28px}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.mission.is-boss .btn.primary{background:var(--boss);border-color:var(--boss);color:#fff}
+.hint{font-size:14.5px;background:var(--info-soft);border-radius:var(--r-sm);padding:12px 14px;white-space:pre-wrap}
+.hint::before{content:"Coach: ";font-weight:700;color:var(--info)}
+.msg{font-size:13.5px;color:var(--muted)}
+.wrapup{padding:18px 20px;display:flex;flex-direction:column;gap:10px}
+.wrapup label{font-weight:700}
+.wrapup textarea{width:100%;box-sizing:border-box;min-height:100px;border:1.5px solid var(--line);border-radius:var(--r-sm);background:var(--surface-2);color:var(--ink);padding:10px 12px;font:inherit;resize:vertical}
+.report{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media (max-width:520px){.report{grid-template-columns:1fr}}
+.nav-row{display:flex;gap:10px;justify-content:space-between;flex-wrap:wrap;padding-top:4px}
+.nav-row .btn.primary{margin-left:auto}
+body.in-mission .title-row{display:none}
+
+/* toast + xp pop */
+.toast{position:fixed;left:50%;top:calc(20px + env(safe-area-inset-top,0px));transform:translate(-50%,calc(-100% - 60px));visibility:hidden;z-index:20;padding:12px 22px;text-align:center;background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:0 10px 40px rgba(16,24,40,.18);transition:transform .45s cubic-bezier(.2,1.3,.3,1);pointer-events:none;max-width:calc(100vw - 32px)}
+.toast.show{transform:translate(-50%,0);visibility:visible}
+.toast b{display:block;font-family:var(--f-display);font-size:22px;font-weight:800;color:var(--ok)}
+.toast span{font-size:13.5px;color:var(--muted)}
+.toast.level b{color:var(--accent);font-size:26px}
+.pop{position:fixed;z-index:21;font-family:var(--f-display);font-weight:800;color:var(--ok);pointer-events:none;animation:pop .9s ease-out forwards}
+@keyframes pop{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(-36px)}}
+
+.qmeta{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.refresh{margin-top:4px;font-size:14.5px}
+.refresh summary{cursor:pointer;font-weight:700;color:var(--info);width:fit-content}
+.refresh[open] summary{margin-bottom:10px}
+.refresh-item{background:var(--surface-2);border:1px solid var(--line);border-radius:var(--r-sm);padding:12px 14px;display:flex;flex-direction:column;gap:6px;margin-bottom:8px}
+.refresh-item p{margin:0}
+.refresh-item pre{margin:0;background:var(--code-bg);color:var(--code-fg);border-radius:8px;padding:10px 12px;overflow-x:auto;font-family:var(--f-mono);font-size:13px}
+/* lessons */
+.lesson{padding:clamp(20px,4vw,36px);display:flex;flex-direction:column;gap:16px;max-width:900px}
+.callout.why{background:var(--info-soft)}
+.callout.why b{color:var(--info)}
+.anatomy{background:var(--surface-2);border:1px solid var(--line);border-radius:var(--r-sm);padding:18px;display:flex;flex-direction:column;gap:10px;align-items:flex-start;overflow-x:auto}
+.an-grid{display:grid;grid-template-columns:auto auto auto;column-gap:4px;row-gap:6px}
+.an{font-family:var(--f-mono);font-size:clamp(15px,2.4vw,20px);padding:6px 10px;border-radius:8px;white-space:nowrap}
+.an.open,.an.close{background:var(--accent-soft);color:var(--accent);font-weight:700}
+.an.content{background:var(--ok-soft);color:var(--ink)}
+.an-l{font-size:12.5px;font-weight:700;color:var(--muted);text-align:center}
+.an-whole{font-size:13.5px;font-weight:700;border-top:2px solid var(--ink);padding-top:6px;width:100%}
+.annot{border:1px solid var(--line);border-radius:var(--r-sm);overflow:hidden}
+.annot-h{font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);padding:8px 14px;background:var(--surface-2);border-bottom:1px solid var(--line)}
+.annot-row{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);border-top:1px solid var(--line)}
+.annot-row:first-of-type{border-top:0}
+.annot .annot-code{background:var(--code-bg);color:var(--code-fg);border:0;border-radius:0;padding:7px 14px;font-family:var(--f-mono);font-size:13.5px;white-space:pre;overflow-x:auto}
+.annot-note{padding:7px 14px;font-size:14px;color:var(--muted)}
+@media (max-width:640px){.annot-row{grid-template-columns:1fr}.annot-note{padding-top:4px}}
+.terms{position:relative}
+.terms summary{list-style:none}
+.terms summary::-webkit-details-marker{display:none}
+.terms dl{position:absolute;right:0;top:calc(100% + 8px);z-index:15;width:min(420px,calc(100vw - 32px));max-height:60vh;overflow:auto;margin:0;padding:14px 16px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-sm);box-shadow:0 10px 40px rgba(16,24,40,.18)}
+.terms dt{font-weight:700;margin-top:8px}
+.terms dt:first-child{margin-top:0}
+.terms dd{margin:2px 0 0;color:var(--muted);font-size:14px}
+.restart{padding:16px 18px;display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center}
+.restart p{margin:2px 0 0}
+.btn.danger{background:var(--bad);border-color:var(--bad);color:#fff}
+/* account + export */
+.auth{padding:16px 18px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px 28px;align-items:start}
+.auth > div:first-child p{margin:4px 0 0}
+@media (max-width:720px){.auth{grid-template-columns:1fr}}
+.auth-form{display:flex;flex-direction:column;gap:6px}
+.auth-form label{font-size:13px;font-weight:700}
+.auth-form input{font:inherit;padding:10px 12px;border:1.5px solid var(--line);border-radius:var(--r-sm);background:var(--surface-2);color:var(--ink)}
+.auth-form input:focus-visible{outline:3px solid color-mix(in srgb,var(--accent) 45%,transparent);outline-offset:1px}
+.auth-form .actions{margin-top:6px}
+.review p{margin:0 0 10px}
+.export{width:100%;min-height:120px;margin-top:10px;font-family:var(--f-mono);font-size:12px;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--surface-2);color:var(--ink);padding:10px}
+/* phones */
+@media (max-width:600px){
+  .mission-bar .steps{order:3;flex-basis:100%}
+  .an{font-size:13px;padding:5px 7px}
+  body{font-size:15px}
+  .editor textarea{white-space:pre-wrap;word-break:break-word;min-height:200px;font-size:13px}
+  .preview iframe{min-height:200px}
+  .drill-head,.drill-foot{padding-inline:14px}
+  .actions .btn{flex:1 1 auto}
+  .actions .msg{flex-basis:100%}
+  .toast{width:calc(100vw - 32px);box-sizing:border-box}
+  .brief-body,.intro p{font-size:16px}
+}
+@media (min-width:861px) and (max-height:820px){.top h1{font-size:clamp(36px,5vw,52px)}}
+@media (min-width:1600px){
+  .wrap{max-width:1440px}
+  body{font-size:16.5px}
+  .editor textarea,.preview iframe{min-height:340px}
+  .editor textarea{font-size:14.5px}
+}
+@media (min-width:2200px){
+  .wrap{max-width:1840px}
+  body{font-size:18px}
+  .top h1{font-size:84px}
+  .editor textarea,.preview iframe{min-height:420px}
+  .editor textarea{font-size:15.5px}
+  .tile{font-size:14.5px}
+}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="config.js"></script>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="top">
+    <div class="title-row">
+      <div>
+        <div class="eyebrow">Week 1 of 12 · HTML &amp; CSS foundations</div>
+        <h1>Full-Stack Gym</h1>
+        <p>One hour a day. You write every line. Each drill checks your code the moment you press Check.</p>
+      </div>
+    </div>
+    <div class="hud" aria-live="polite">
+      <div class="lvl" id="lvlRing"><span>LVL</span><b id="sLvl">1</b></div>
+      <div class="xp frame">
+        <div class="xp-label"><span>Next level</span><span><b id="sXp">0</b> / <span id="sNext">150</span></span></div>
+        <div class="xpbar"><div class="xpfill" id="sFill"></div></div>
+      </div>
+      <div class="stat streak frame"><b id="sStreak">0</b><span>day streak</span></div>
+      <div class="stat cleared frame"><b id="sDrills">0/0</b><span>drills cleared</span></div>
+    </div>
+  </header>
+  <div class="toast" id="toast" role="status" aria-live="polite"><b></b><span></span></div>
+
+  <div id="hub" class="hub">
+  <div id="auth" class="auth frame" hidden></div>
+  <div class="rules frame">
+    <span><b>You type everything.</b> No copy-pasting from AI.</span>
+    <span><b>Stuck?</b> Open the drill's Refresher, or ask Claude in chat.</span>
+    <span><b>Stuck for 10 minutes?</b> Re-read the lesson, then try again.</span>
+    <span class="sync" id="sync">Progress saves in this browser</span>
+  </div>
+
+  <section class="block">
+    <h3>Missions <span class="eyebrow">Week 1 · each one unlocks the next</span></h3>
+    <div class="missions" id="missions"></div>
+  </section>
+  <section class="block">
+    <h3>Road map <span class="eyebrow">3 stages · from zero to professional</span></h3>
+    <nav class="map" aria-label="Learning road map" id="map"></nav>
+  </section>
+
+
+  <div class="review frame">
+    <p><b>Weekly review with Claude.</b> When you finish a week, press <b>Copy progress</b> and paste it into your chat with Claude with “review my week”. It holds your passing code, answers and notes, so Claude can review your code like a senior dev would.</p>
+    <div class="actions"><button class="btn" id="exportBtn">Copy progress</button><span class="msg" id="exportMsg"></span></div>
+    <textarea id="exportBox" class="export" readonly hidden aria-label="Your progress as text"></textarea>
+  </div>
+    <div class="restart frame">
+      <div><b>Reset all progress</b><p class="msg">Wipe your XP, streak, drills, answers and notes, and begin again from Mission 01.</p></div>
+      <div class="actions" id="restartBox"><button class="btn" id="restartBtn">Reset all progress</button></div>
+    </div>
+  </div>
+  <main id="mission" class="mission" hidden></main>
+</div>
+
+<script>
+const WEEKS = [
+  ["HTML structure + CSS basics", true],
+  ["Layout: flex, grid, responsive"],
+  ["JavaScript basics"],
+  ["DOM + events: tabs, galleries, forms"],
+  ["Git, terminal, deploy, fetch + JSON"],
+  ["Node + HTTP: your own server"],
+  ["Database + secrets: a lead API"],
+  ["React fundamentals"],
+  ["Next.js: routes, data, forms"],
+  ["Tailwind + a CMS"],
+  ["Hosting, DNS, security, SEO, speed"],
+  ["Capstone: a full site, alone"],
+];
+
+const STAGES = [
+  {name:"Stage 1 · The core", when:"Weeks 1–12 · build and run sites on your own", items:WEEKS.map(([t,on],i)=>["W"+(i+1), t, on])},
+  {name:"Stage 2 · Going deeper", when:"Months 4–12 · unlocks after Week 12", items:[
+    ["M4","TypeScript"],["M5","Testing"],["M6","Authentication + user roles"],["M7","Databases in depth + an ORM"],
+    ["M8","APIs, webhooks, payments"],["M9","Accessibility"],["M10","Performance + caching"],["M11–12","PHP + WordPress development"]]},
+  {name:"Stage 3 · Professional level", when:"Year 2 · unlocks after Stage 2", items:[
+    ["Y2 Q1","DevOps: Linux, Docker, CI/CD"],["Y2 Q1","Cloud: storage, functions, CDNs"],["Y2 Q2","App architecture + background jobs"],["Y2 Q2","Realtime with WebSockets"],
+    ["Y2 Q3","Security in depth (OWASP Top 10)"],["Y2 Q3","Mobile with React Native"],["Y2 Q4","AI features with LLM APIs"],["Y2 Q4","System design + scaling"]]},
+];
+
+const $ = (d, s) => d.querySelector(s);
+const $$ = (d, s) => [...d.querySelectorAll(s)];
+const words = s => (s || "").trim().split(/\s+/).filter(Boolean).length;
+
+const DAYS = [
+ { title:"The skeleton of a page", goal:"Write HTML elements, nest them correctly and build a clean heading outline.",
+   drills:[
+    {id:"d1-h1", title:"Name the project", brief:"Write an <h1> with the project name: Wave by Raghava.",
+     html:"<!-- Write an h1 with the project name: Wave by Raghava -->\n", css:"",
+     tests:[["There is exactly one <h1>", d=>$$(d,"h1").length===1],
+            ["The <h1> says “Wave by Raghava”", d=>/wave\s+by\s+raghava/i.test($(d,"h1").textContent)]]},
+    {id:"d1-tag", title:"Add a tagline", brief:"Below the heading, add a <p> tagline of at least 4 words.",
+     html:"<h1>Wave by Raghava</h1>\n<!-- Add a <p> tagline below the heading -->\n", css:"",
+     tests:[["There is a <p>", d=>!!$(d,"p")],
+            ["The <p> comes after the <h1>", d=>!!($(d,"h1").compareDocumentPosition($(d,"p")) & 4)],
+            ["The tagline has at least 4 words", d=>words($(d,"p").textContent)>=4]]},
+    {id:"d1-list", title:"List the highlights", brief:"Add a bulleted list with at least 3 project highlights (a pool, the location, anything).",
+     html:"<h1>Wave by Raghava</h1>\n<p>Lakeside homes in Kokapet</p>\n<!-- List at least 3 highlights in a <ul> -->\n", css:"",
+     tests:[["There is a <ul>", d=>!!$(d,"ul")],
+            ["It has at least 3 <li> items", d=>$$(d,"ul > li").length>=3],
+            ["No item is empty", d=>$$(d,"ul > li").length>0 && $$(d,"ul > li").every(li=>li.textContent.trim())]]},
+    {id:"d1-outline", title:"Fix the outline", brief:"The headings below skip levels. Fix them so the page reads h1 → h2 without gaps. Keep the text.",
+     html:"<h1>Wave by Raghava</h1>\n<h3>Amenities</h3>\n<p>Clubhouse, pool, gym.</p>\n<h4>Location</h4>\n<p>5 minutes from the ORR.</p>\n<h2>Floor plans</h2>\n<p>2 and 3 BHK.</p>\n", css:"",
+     tests:[["Still exactly one <h1>", d=>$$(d,"h1").length===1],
+            ["No heading skips a level", d=>{let prev=0; for(const h of $$(d,"h1,h2,h3,h4,h5,h6")){const l=+h.tagName[1]; if(l>prev+1) return false; prev=l;} return prev>0;}],
+            ["Amenities, Location and Floor plans are all <h2>", d=>{const t=$$(d,"h2").map(h=>h.textContent.trim().toLowerCase()); return ["amenities","location","floor plans"].every(x=>t.includes(x));}]]}
+   ]},
+ { title:"Links, images and meaning", goal:"Use attributes, link inside a page, write alt text and pick tags that describe what things are.",
+   drills:[
+    {id:"d2-cta", title:"Make the call to action", brief:"Add a link with the text “Enquire now” that jumps to #enquire.",
+     html:"<h1>Iris by Raghava</h1>\n<!-- Add a link that says \"Enquire now\" and jumps to #enquire -->\n", css:"",
+     tests:[["There is a link (<a>)", d=>!!$(d,"a")],
+            ["Its href is exactly #enquire", d=>$(d,"a").getAttribute("href")==="#enquire"],
+            ["Its text says Enquire", d=>/enquire/i.test($(d,"a").textContent)]]},
+    {id:"d2-img", title:"Image with alt text", brief:"Add an <img> with src=\"tower.jpg\" and a useful alt text of 3+ words. The image won't load here, which is exactly when alt text shows.",
+     html:"<!-- Add an <img> here -->\n", css:"",
+     tests:[["There is an <img>", d=>!!$(d,"img")],
+            ["Its src is tower.jpg", d=>/tower\.jpg$/.test($(d,"img").getAttribute("src")||"")],
+            ["Its alt text has at least 3 words", d=>words($(d,"img").getAttribute("alt"))>=3]]},
+    {id:"d2-target", title:"Build the jump target", brief:"Add a <section> with id=\"enquire\" that holds an <h2>. Then click the link in the preview.",
+     html:"<a href=\"#enquire\">Enquire now</a>\n<div style=\"height:400px\"></div>\n<!-- Add a <section> with id=\"enquire\" containing an <h2> -->\n", css:"",
+     tests:[["There is a <section id=\"enquire\">", d=>!!$(d,"section#enquire")],
+            ["It contains an <h2>", d=>!!$(d,"section#enquire h2")],
+            ["The <h2> has text", d=>!!$(d,"section#enquire h2").textContent.trim()]]},
+    {id:"d2-sem", title:"Use meaningful tags", brief:"Replace each div with the tag that describes it. Keep the content.",
+     html:"<div class=\"header\">Wave by Raghava</div>\n<div class=\"main\">\n  <h1>Homes near the ORR</h1>\n</div>\n<div class=\"footer\">RERA approved</div>\n", css:"",
+     tests:[["There is a <header>", d=>!!$(d,"header")],
+            ["There is a <main> holding the <h1>", d=>!!$(d,"main h1")],
+            ["There is a <footer>", d=>!!$(d,"footer")],
+            ["No <div> is left", d=>$$(d,"div").length===0]]}
+   ]},
+ { title:"CSS: paint and boxes", goal:"Write CSS rules, understand which rule wins, and control the box model.",
+   drills:[
+    {id:"d3-color", title:"Brand colour", brief:"Make only .title the brand blue, #1F4E79.",
+     html:"<h1 class=\"title\">Muppa Melody</h1>\n<p>Gated villas in Kollur.</p>\n", css:"/* Make .title the brand blue: #1F4E79 */\n",
+     tests:[["The title is #1F4E79", (d,w)=>w.getComputedStyle($(d,".title")).color==="rgb(31, 78, 121)"],
+            ["The paragraph stays its normal colour", (d,w)=>w.getComputedStyle($(d,"p")).color!=="rgb(31, 78, 121)"]]},
+    {id:"d3-pad", title:"Pad the card", brief:"Give .card 24px of padding on every side and a 1px solid border.",
+     html:"<div class=\"card\">\n  <h2>3 BHK</h2>\n  <p>1,850 sq ft</p>\n</div>\n", css:"/* Style .card here */\n",
+     tests:[["24px padding on all four sides", (d,w)=>{const s=w.getComputedStyle($(d,".card")); return ["Top","Right","Bottom","Left"].every(k=>s["padding"+k]==="24px");}],
+            ["A 1px solid border all round", (d,w)=>{const s=w.getComputedStyle($(d,".card")); return ["Top","Right","Bottom","Left"].every(k=>s["border"+k+"Width"]==="1px"&&s["border"+k+"Style"]==="solid");}]]},
+    {id:"d3-box", title:"Exactly 320px", brief:"On screen this card is wider than 320px. Make it exactly 320px wide without changing the width or padding values.",
+     html:"<div class=\"card\">\n  <h2>3 BHK</h2>\n  <p>1,850 sq ft</p>\n</div>\n", css:".card {\n  width: 320px;\n  padding: 24px;\n  border: 1px solid #999;\n}\n",
+     tests:[["The card measures 320px on screen", d=>Math.round($(d,".card").getBoundingClientRect().width)===320],
+            ["Padding is still 24px", (d,w)=>w.getComputedStyle($(d,".card")).paddingLeft==="24px"]]},
+    {id:"d3-price", title:"Make the price pop", brief:"Make .price bold and 28px. The other paragraph must not change.",
+     html:"<div class=\"card\">\n  <p>3 BHK · 1,850 sq ft</p>\n  <p class=\"price\">₹1.45 Cr onwards</p>\n</div>\n", css:"/* Style .price here */\n",
+     tests:[["The price is bold (700+)", (d,w)=>+w.getComputedStyle($(d,".price")).fontWeight>=700],
+            ["The price is 28px", (d,w)=>w.getComputedStyle($(d,".price")).fontSize==="28px"],
+            ["The first paragraph is untouched", (d,w)=>{const s=w.getComputedStyle($(d,"p")); return s.fontSize!=="28px" && +s.fontWeight<700;}]]}
+   ]},
+ { title:"Flexbox: things in a row", goal:"Line things up with flexbox: rows, gaps, centring and wrapping.",
+   drills:[
+    {id:"d4-bar", title:"Header bar", brief:"Put the logo on the left and the links on the right, on the same line.",
+     html:"<header class=\"bar\">\n  <span class=\"logo\">AVR</span>\n  <nav class=\"links\">Projects · About · Contact</nav>\n</header>\n", css:".bar { padding: 16px; background: #eef1f6; }\n\n",
+     tests:[["Logo and links share one line", d=>Math.abs($(d,".logo").getBoundingClientRect().top-$(d,".links").getBoundingClientRect().top)<10],
+            ["Logo is at the left edge", d=>$(d,".logo").getBoundingClientRect().left-$(d,".bar").getBoundingClientRect().left<=18],
+            ["Links reach the right edge", d=>$(d,".bar").getBoundingClientRect().right-$(d,".links").getBoundingClientRect().right<=18]]},
+    {id:"d4-row", title:"Amenities in a row", brief:"Make .amenities a flex row with a 16px gap.",
+     html:"<div class=\"amenities\">\n  <span class=\"chip\">Pool</span>\n  <span class=\"chip\">Gym</span>\n  <span class=\"chip\">Clubhouse</span>\n  <span class=\"chip\">Jogging track</span>\n</div>\n", css:".chip { padding: 8px 14px; border: 1px solid #999; border-radius: 99px; }\n\n",
+     tests:[[".amenities uses flex", (d,w)=>w.getComputedStyle($(d,".amenities")).display==="flex"],
+            ["The gap is 16px", (d,w)=>w.getComputedStyle($(d,".amenities")).columnGap==="16px"],
+            ["All chips sit on one line", d=>new Set($$(d,".chip").map(c=>Math.round(c.getBoundingClientRect().top))).size===1]]},
+    {id:"d4-centre", title:"Dead centre", brief:"Centre .content inside .hero, both left-right and top-bottom.",
+     html:"<section class=\"hero\">\n  <div class=\"content\">Launching soon</div>\n</section>\n", css:".hero { height: 300px; background: #1F4E79; color: white; }\n.content { width: 180px; padding: 12px; border: 1px solid white; }\n\n",
+     tests:[["Centred left-right", d=>{const h=$(d,".hero").getBoundingClientRect(),c=$(d,".content").getBoundingClientRect(); return Math.abs((h.left+h.width/2)-(c.left+c.width/2))<=2;}],
+            ["Centred top-bottom", d=>{const h=$(d,".hero").getBoundingClientRect(),c=$(d,".content").getBoundingClientRect(); return Math.abs((h.top+h.height/2)-(c.top+c.height/2))<=2;}]]},
+    {id:"d4-wrap", title:"Let it wrap", brief:"The chips spill out of the 260px box. Let them wrap onto new lines.",
+     html:"<div class=\"amenities\">\n  <span class=\"chip\">Pool</span>\n  <span class=\"chip\">Gym</span>\n  <span class=\"chip\">Clubhouse</span>\n  <span class=\"chip\">Jogging track</span>\n  <span class=\"chip\">Kids play area</span>\n  <span class=\"chip\">Yoga deck</span>\n</div>\n",
+     css:".amenities { display: flex; gap: 8px; width: 260px; border: 1px dashed #999; padding: 8px; }\n.chip { padding: 6px 12px; border: 1px solid #999; border-radius: 99px; white-space: nowrap; flex-shrink: 0; }\n",
+     tests:[["The row wraps", (d,w)=>w.getComputedStyle($(d,".amenities")).flexWrap==="wrap"],
+            ["Every chip stays inside the box", d=>{const b=$(d,".amenities").getBoundingClientRect(); return $$(d,".chip").every(c=>c.getBoundingClientRect().right<=b.right+1);}]]}
+   ]},
+ { title:"Boss: a hero from a blank file", goal:"No starter code. Build the top of a real-estate landing page using everything from this week.",
+   drills:[
+    {id:"d5-boss", useCss:true, boss:true, title:"Property hero", brief:"Build a hero for any project: semantic tags, an h1, a tagline, a row of highlights, a button-like link to #enquire and the enquiry section it jumps to.",
+     html:"", css:"",
+     tests:[["Uses <header> or <main>", d=>!!$(d,"header, main")],
+            ["Exactly one <h1>", d=>$$(d,"h1").length===1],
+            ["A <p> tagline", d=>!!$(d,"p") && words($(d,"p").textContent)>=3],
+            ["A <ul class=\"highlights\"> with 3+ items", d=>$$(d,"ul.highlights > li").length>=3],
+            ["The highlights sit in a flex row", (d,w)=>w.getComputedStyle($(d,"ul.highlights")).display==="flex"],
+            ["A link to #enquire", d=>!!$(d,'a[href="#enquire"]')],
+            ["That link looks like a button (padding + background)", (d,w)=>{const s=w.getComputedStyle($(d,'a[href="#enquire"]')); return parseFloat(s.paddingLeft)>=12 && s.backgroundColor!=="rgba(0, 0, 0, 0)" && s.backgroundColor!=="transparent";}],
+            ["A <section id=\"enquire\"> with an <h2>", d=>!!$(d,"section#enquire h2")]]}
+   ]}
+];
+
+/* Briefings (one screen each) and questions (recall → read the code → spot the bug) per mission */
+const CONTENT = [
+ { brief:[
+    {t:"Elements and tags", body:"Every piece of a page is an element: an opening tag, the content, and a closing tag. The tag name says what the thing is: a paragraph, a heading, a list item.",
+     ex:"<p>3 BHK apartments from ₹1.2 Cr</p>",
+     bad:"Forgetting the slash in the closing tag. <p>…<p> opens a second paragraph instead of closing the first one.",
+     work:"Every block of text on the Wave and Iris landing pages is a <p>, <h2> or <li> written exactly like this."},
+    {t:"Nesting", body:"Elements go inside other elements, like boxes inside boxes. Indent the inner ones so you can see the structure, and always close the inner box before the outer one.",
+     ex:"<ul>\n  <li>Clubhouse</li>\n  <li>Swimming pool</li>\n  <li>Jogging track</li>\n</ul>",
+     bad:"<p><strong>Ready to move</p></strong> closes in the wrong order. The strong was opened last, so it closes first.",
+     work:"The amenities list on every landing page you've shipped is a <ul> with <li> items nested inside."},
+    {t:"Headings are an outline", body:"h1 to h6 describe the page's structure, like chapter titles. One h1 for the main topic, h2 for each section, h3 inside those. Going down, move one level at a time. Going back up, you can jump to any level: h3 → h2 is fine. Never pick a heading for its size. CSS controls size.",
+     ex:"<h1>Wave by Raghava</h1>\n  <h2>Amenities</h2>\n    <h3>Clubhouse</h3>\n  <h2>Location</h2>",
+     bad:"Jumping from h1 straight to h3 because it \"looks the right size\". Google and screen readers read that as a missing level.",
+     work:"This is the strict h1 → h2 → h3 rule on the Muppa Melody page."}],
+   quiz:[
+    {t:"recall", q:"How many <h1> tags should one page normally have?", opts:["One","One per section","As many as you like","None, use a <div>"], a:0,
+     why:"The h1 is the page's main title. One h1 keeps the outline clear for Google and screen readers."},
+    {t:"recall", q:"Which tag makes a bulleted list?", opts:["<ul>","<ol>","<li>","<list>"], a:0,
+     why:"ul means unordered list (bullets). ol is ordered (numbers). li is one item inside either."},
+    {t:"read", q:"What does this show on the page?", code:"<ul>\n  <li>Pool</li>\n  <li>Gym</li>\n</ul>", opts:["Two bullet points: Pool and Gym","One line: Pool Gym","A numbered list","Nothing, it needs a heading"], a:0,
+     why:"A ul with two li items renders as two bullet points."},
+    {t:"read", q:"In this outline, which heading sits inside the Amenities section?", code:"<h1>Iris by Raghava</h1>\n<h2>Amenities</h2>\n<h3>Sky lounge</h3>\n<h2>Location</h2>", opts:["Sky lounge","Iris by Raghava","Location","None of them"], a:0,
+     why:"An h3 belongs to the nearest h2 above it. Location is a new h2, so it starts a new section."},
+    {t:"bug", q:"What's wrong with this line?", code:"<h1>Iris by Raghava</h2>", opts:["The closing tag doesn't match the opening tag","An h1 can't hold text","Nothing, it works","It needs a class"], a:0,
+     why:"An element closes with the same name it opened with: <h1> … </h1>."},
+    {t:"bug", q:"What's wrong here?", code:"<p><strong>Ready to move</p></strong>", opts:["The tags close in the wrong order","strong can't go inside p","The p needs a class","Nothing"], a:0,
+     why:"Close the inner box first: <p><strong>Ready to move</strong></p>."}]},
+ { brief:[
+    {t:"Attributes", body:"Attributes add details inside the opening tag, written name=\"value\". The tag says what something is. Attributes say which file, where it goes, or how it behaves.",
+     ex:"<img src=\"tower.jpg\" alt=\"Iris towers at dusk\">\n<a href=\"/contact\">Contact us</a>",
+     bad:"Leaving out the = or the quotes. href \"#enquire\" does nothing. Always write name=\"value\".",
+     work:"Every Enquire button, gallery image and form field on your sites is configured through attributes."},
+    {t:"Links and ids", body:"A link's href says where it goes. Another page: href=\"/contact\". Another site: the full https:// address. A spot on the same page: # followed by that element's id.",
+     ex:"<a href=\"#enquire\">Enquire now</a>\n…\n<section id=\"enquire\">\n  <h2>Book a site visit</h2>\n</section>",
+     bad:"Using the same id twice: an id must be unique, or the link jumps to whichever comes first. ids are also case-sensitive: #Location will not find id=\"location\". And the # is required: href=\"amenities\" looks for a page called amenities.",
+     work:"This is how \"Enquire now\" on the Raghava landing pages scrolls down to the form."},
+    {t:"Images and alt text", body:"img has no closing tag. src is the file; alt describes it in words. Write alt for someone who can't see the picture: what's in it and why it matters.",
+     ex:"<img src=\"clubhouse.jpg\"\n     alt=\"Rooftop clubhouse with an infinity pool\">",
+     bad:"alt=\"image\" or alt=\"IMG_2041\" tells nobody anything. A purely decorative image gets an empty alt=\"\".",
+     work:"Google Images and screen readers both rely on alt text in your project galleries."},
+    {t:"Tags with meaning", body:"header, nav, main, section and footer describe what each part of the page is. They look exactly like a div, but browsers, Google and screen readers understand them. A menu is a nav holding a ul, with one link per li.",
+     ex:"<header>\n  <nav>\n    <ul>\n      <li><a href=\"#amenities\">Amenities</a></li>\n      <li><a href=\"#location\">Location</a></li>\n    </ul>\n  </nav>\n</header>\n<main>\n  <section id=\"amenities\">…</section>\n</main>\n<footer>RERA details</footer>",
+     bad:"Building everything out of divs. It looks fine, but the page loses its meaning.",
+     work:"Your Next.js sites wrap every page in header, main and footer in the layout file."}],
+   quiz:[
+    {t:"recall", q:"What is the alt attribute on an image for?", opts:["Describing the image when it can't be seen","Setting the image size","Making it load faster","Adding a caption under it"], a:0,
+     why:"Screen readers read alt aloud, browsers show it when the image fails, and Google uses it to understand the picture."},
+    {t:"recall", q:"Which attribute tells a link where to go?", opts:["href","src","alt","link"], a:0,
+     why:"href is the link's destination. src is for files like images."},
+    {t:"read", q:"Where does clicking this take you?", code:"<a href=\"#enquire\">Enquire</a>", opts:["To the element with id=\"enquire\" on this page","To a page called enquire.html","Nowhere, # means empty","To the top of the page"], a:0,
+     why:"A # link jumps to the element whose id matches."},
+    {t:"read", q:"Which of these links to another website?", opts:["<a href=\"https://raghava.world\">","<a href=\"#raghava\">","<a src=\"raghava.world\">","<link>raghava.world</link>"], a:0,
+     why:"Another site needs the full address including https://."},
+    {t:"bug", q:"Why won't this link jump to the form?", code:"<a href=\"#enquire\">Enquire</a>\n…\n<section id=\"enquiry\">…</section>", opts:["The href and the id don't match","Sections can't have ids","It needs target=\"_blank\"","Links can't jump down a page"], a:0,
+     why:"#enquire looks for id=\"enquire\", but the section is enquiry. One letter breaks it."},
+    {t:"bug", q:"What's missing from this image?", code:"<img src=\"tower.jpg\">", opts:["Alt text","A closing </img>","An href","Nothing"], a:0,
+     why:"Without alt, screen readers say nothing useful and Google can't tell what the image shows."}]},
+ { brief:[
+    {t:"How CSS works", body:"CSS is a list of rules. A selector picks the elements, then declarations inside { } style them. Each declaration is property: value; and ends with a semicolon. Property names use American spelling (color, not colour), and a number sticks to its unit: 16px, never 16 px. A misspelt property or a gap in a unit is silently ignored.",
+     ex:"h1 {\n  color: #1F4E79;\n  font-size: 40px;\n}",
+     bad:"Forgetting a semicolon or the colon. padding 24px; (no colon) is ignored, and color: #333 padding: 24px; (no semicolon) breaks both lines.",
+     work:"Every colour and size on your sites ends up as rules like this, Tailwind included."},
+    {t:"Selectors", body:"A tag selector (p) hits every p. A class selector (.price) hits elements with class=\"price\". An id selector (#enquire) hits one element. Use classes for almost everything.",
+     ex:"p { color: #333; }\n.price { color: #1F4E79; }\n#enquire { padding: 40px; }",
+     bad:"Writing price instead of .price. Without the dot, CSS looks for a <price> tag that doesn't exist.",
+     work:"Tailwind is thousands of ready-made class selectors."},
+    {t:"Which rule wins", body:"When two rules target the same element and set the same property, the browser gives each selector a score and the higher score wins. Count three things in the selector: ids (#), classes (.), and tag names (h1, p). Write it as ids-classes-tags and compare left to right, like a version number. The first column that differs decides. Only if all three are equal does the rule written later win.",
+     ex:"SELECTOR        ids  classes  tags   SCORE\np                0     0       1     0-0-1\n.price           0     1       0     0-1-0\n.card p          0     1       1     0-1-1\n.card .price     0     2       0     0-2-0\n#hero h1         1     0       1     1-0-1\n\nExample: which colour does the h1 get?\n  #hero h1 { color: red; }    1-0-1\n  .title   { color: blue; }   0-1-0\n  <section id=\"hero\"><h1 class=\"title\">…\n\n#hero h1 means \"an h1 inside the element with id hero\",\nso both rules hit this h1. Compare the first column:\n1 id beats 0 ids → red wins, even though .title is written later.\n\nCould it be .hero instead of #hero? Yes, if you give the section\nclass=\"hero\" instead of id=\"hero\". Then:\n  .hero h1  0-1-1   vs   .title  0-1-0\nRed still wins, but now by the tags column. On real sites, style\nwith classes; keep ids for # link targets like id=\"enquire\".",
+     bad:"Thinking the rule written later always wins. Order only breaks a tie; the score is checked first. And reaching for !important to win: make your selector score higher instead.",
+     work:"When a WordPress theme overrides your styles, its selector simply has a higher score."},
+    {t:"Selectors that look inside", body:"A space between selectors means \"inside\": .card p hits every p inside a .card. :last-child picks an element only when it's the last one in its parent. To compare two selectors, count ids, then classes, then tags. More ids wins; if equal, more classes wins; if equal, more tags wins.",
+     ex:".card p { }        /* 1 class + 1 tag  */\n.price { }         /* 1 class          */\n/* .card p wins over .price: same classes, one more tag */\n\n.card .price { }   /* 2 classes: beats .card p */\n#hero h1 { }       /* 1 id: beats any number of classes */\n\n.card:last-child { margin-bottom: 0; }",
+     bad:"Fixing a lost fight with !important. Make your selector one step more specific instead, like .card .price.",
+     work:"Most \"why won't my style apply?\" problems on WordPress sites are a longer selector in the theme winning."},
+    {t:"Padding, border and margin", body:"Every element is a box with three layers around its content. padding is space inside the border. border is the line itself. margin is space outside the border, pushing other elements away. Each one has a property per side, and a shorthand that sets all sides at once.",
+     ex:"/* padding: 24px is short for all four of these */\npadding-top: 24px;\npadding-right: 24px;\npadding-bottom: 24px;\npadding-left: 24px;\n\n/* border = width, style, colour in one line */\nborder: 1px solid #ddd;\n/* the long way */\nborder-width: 1px;\nborder-style: solid;   /* solid, dashed, dotted… */\nborder-color: #ddd;\n/* one side only */\nborder-bottom: 2px solid #1F4E79;\n\nborder-radius: 12px;   /* rounds the corners */\nmargin-bottom: 16px;   /* space below the box */",
+     bad:"border: 1px #ddd with no style. Without solid (or dashed, dotted) no border is drawn at all.",
+     work:"Tailwind's p-6, border, rounded-xl and mb-4 are exactly these properties."},
+    {t:"How wide is a box?", body:"By default, width sets only the content. Padding and border are added on both sides, left and right, on top of it. So the box on screen is wider than the width you wrote. box-sizing: border-box changes the rule: width then includes padding and border, so what you write is what you get.",
+     ex:".card {\n  width: 300px;\n  padding: 20px;          /* left 20 + right 20 */\n  border: 2px solid #ddd; /* left 2 + right 2 */\n}\n/* default:     300 + 20 + 20 + 2 + 2 = 344px wide */\n\n.card { box-sizing: border-box; }\n/* border-box:  exactly 300px; the content shrinks to 256px */",
+     bad:"Adding padding only once. Padding and border count on both sides, so 20px of padding adds 40px to the width.",
+     work:"Tailwind's base styles set border-box on everything, which is why your Tailwind widths always match."}],
+   quiz:[
+    {t:"recall", q:"Which selector targets class=\"card\"?", opts:[".card","#card","card","*card"], a:0,
+     why:"A dot means class. A # means id. No symbol means a tag name."},
+    {t:"recall", q:"Padding is…", opts:["Space inside the border","Space outside the border","The border's thickness","The text size"], a:0,
+     why:"Padding pushes the content in from the border. Margin pushes other elements away."},
+    {t:"read", q:"What colour is the price?", code:"p { color: red; }\n.price { color: blue; }\n\n<p class=\"price\">₹1.2 Cr</p>", opts:["Blue","Red","Purple","Black"], a:0,
+     why:"A class selector is more specific than a tag selector, so .price wins."},
+    {t:"read", q:"A box has width: 300px, padding: 20px and a 2px border. With default settings, how wide is it on screen?", opts:["344px","300px","320px","342px"], a:0,
+     why:"300 + 20 + 20 padding + 2 + 2 border = 344px. border-box would keep it at 300px."},
+    {t:"bug", q:"Why isn't the title blue?", code:"title { color: blue; }\n\n<h1 class=\"title\">Iris</h1>", opts:["The selector is missing the dot: .title","An h1 can't be blue","It should say colour","It needs !important"], a:0,
+     why:"title without a dot looks for a <title> tag. The class needs .title."},
+    {t:"bug", q:"Only the colour works here. Why?", code:".card { color: #333 padding: 24px; }", opts:["A missing semicolon after #333","padding needs quotes","Classes can't have padding","24px should be 24"], a:0,
+     why:"Without the semicolon, CSS reads \"#333 padding: 24px\" as one broken value."}]},
+ { brief:[
+    {t:"Flex containers", body:"Put display: flex on a parent and its direct children line up in a row. The parent is the container; the children are the items.",
+     ex:".amenities {\n  display: flex;\n  gap: 16px;\n}",
+     bad:"Putting display: flex on the children instead of the parent.",
+     work:"Every header with a logo on the left and a menu on the right is flexbox."},
+    {t:"The two directions", body:"justify-content spreads items along the row, left to right. align-items lines them up across it, top to bottom. Switch flex-direction to column and the two swap.",
+     ex:".bar {\n  display: flex;\n  justify-content: space-between; /* left ↔ right */\n  align-items: center;            /* top ↕ bottom */\n}",
+     bad:"Using justify-content to centre something vertically. In a row, vertical is align-items.",
+     work:"This is how the AVR header keeps the logo and menu on one line."},
+    {t:"Gap, wrap and centring", body:"gap adds space between items without margins. flex-wrap: wrap lets items move to a new line when there's no room. Set both justify-content and align-items to center to put something dead centre.",
+     ex:".hero {\n  display: flex;\n  justify-content: center;\n  align-items: center;\n  height: 400px;\n}",
+     bad:"Centring with margins and guesswork. Two flex lines do it exactly at any screen size.",
+     work:"Amenity chips that wrap neatly on phones use flex-wrap."}],
+   quiz:[
+    {t:"recall", q:"You put display: flex on a parent. By default its children…", opts:["Sit side by side in a row","Stack in a column","Overlap each other","Disappear"], a:0,
+     why:"Flex lays children out in a row unless you change flex-direction."},
+    {t:"recall", q:"Which property adds space between flex items?", opts:["gap","padding","margin-between","space"], a:0,
+     why:"gap puts space between items only, never on the outer edges."},
+    {t:"read", q:"In a flex row, which property moves items up and down?", opts:["align-items","justify-content","flex-direction","gap"], a:0,
+     why:"justify-content works along the row. align-items works across it."},
+    {t:"read", q:"The header has a logo and a menu. Where do they end up?", code:".bar {\n  display: flex;\n  justify-content: space-between;\n}", opts:["Logo on the left, menu on the right","Both in the centre","Stacked on top of each other","Menu on the left"], a:0,
+     why:"space-between pushes the first item to the start and the last to the end."},
+    {t:"bug", q:"These chips squash together instead of moving to a new line. What's missing?", code:".chips {\n  display: flex;\n  gap: 8px;\n}", opts:["flex-wrap: wrap","align-items: wrap","display: grid","gap: auto"], a:0,
+     why:"Without flex-wrap: wrap, flex keeps everything on one line and shrinks it."},
+    {t:"bug", q:"Why isn't .content centred vertically?", code:".hero {\n  display: flex;\n  justify-content: center;\n  height: 400px;\n}", opts:["align-items: center is missing","The height is too big","justify-content works vertically","Flex can't centre vertically"], a:0,
+     why:"justify-content centred it left to right. Top to bottom needs align-items."}]},
+ { brief:[
+    {t:"Plan before you type", body:"Developers sketch the structure first. Write the HTML with no CSS, check it reads well as plain text, then style it.",
+     ex:"<header>…</header>\n<main>\n  <h1>…</h1>\n  <p>…</p>\n  <ul class=\"highlights\">…</ul>\n  <a href=\"#enquire\">…</a>\n</main>\n<section id=\"enquire\">…</section>",
+     bad:"Styling while you're still building the structure. You end up fixing layout and markup at the same time.",
+     work:"This is the same order as the hero on every landing page you've shipped."},
+    {t:"Make a link look like a button", body:"A link stays a link. CSS makes it look like a button: padding, a background colour, a text colour, and no underline.",
+     ex:".cta {\n  display: inline-block;\n  padding: 12px 24px;\n  background: #1F4E79;\n  color: white;\n  text-decoration: none;\n  border-radius: 8px;\n}",
+     bad:"Putting a <button> inside an <a>. Use one or the other: links go somewhere, buttons do something.",
+     work:"Every \"Enquire now\" call to action you've shipped is styled like this."}],
+   quiz:[
+    {t:"recall", q:"Which tag holds the main project name on a page?", opts:["<h1>","<title>","<header>","<strong>"], a:0,
+     why:"<title> is the browser tab. The visible main heading is the h1."},
+    {t:"recall", q:"Which line makes padding count inside the width?", opts:["box-sizing: border-box","display: flex","width: auto","margin: 0"], a:0,
+     why:"border-box folds padding and border into the width you set."},
+    {t:"read", q:"Which tag should wrap the main content of the page?", opts:["<main>","<section>","<body>","<div>"], a:0,
+     why:"There's one main per page, holding the content that's unique to it."},
+    {t:"bug", q:"This button-link has no padding. Why?", code:".cta { padding 12px 24px; }", opts:["The colon after padding is missing","padding needs px on both values","Links can't have padding","It needs !important"], a:0,
+     why:"Every declaration needs property: value. Without the colon CSS ignores it."}]}
+];
+DAYS.forEach((d,i)=>Object.assign(d, CONTENT[i]));
+/* Harder second half of each mission: debugging, building from a written brief, stricter checks.
+   Tests get (doc, window, source) so they can check the code you wrote, not only what renders. */
+const H = (d,s) => [...d.querySelectorAll(s)];
+const txt = el => (el && el.textContent || "").trim();
+const lazy = t => /^(a pool|the location|anything|hi|hello|test|title|heading|image|text|item|abc|xyz)$/i.test(t.trim());
+const px = (w,el,prop) => parseFloat(w.getComputedStyle(el)[prop]);
+const BLUE = "rgb(31, 78, 121)";
+
+const EXTRA_TESTS = {
+  "d1-list":  [["Each highlight is a real feature (2+ words, no placeholders)", d=>H(d,"ul > li").every(li=>words(txt(li))>=2 && !lazy(txt(li)))]],
+  "d1-tag":   [["The tagline says something specific (6+ words)", d=>words(txt($(d,"p")))>=6]],
+  "d2-img":   [["The alt describes the picture (4+ words, no \"image\" or \"picture\")", d=>{const a=$(d,"img").getAttribute("alt")||""; return words(a)>=4 && !/\b(image|picture|photo|img)\b/i.test(a);}]],
+  "d2-target":[["The <h2> is a real heading (2+ words)", d=>words(txt($(d,"section#enquire h2")))>=2 && !lazy(txt($(d,"section#enquire h2")))]],
+};
+
+const MORE = [
+ { brief:[
+    {t:"Lists inside lists", body:"An ordered list (ol) numbers its items; use it when order matters, like steps. Any li can hold a whole new list inside it, for sub-points. The inner list goes inside the li, before its closing tag.",
+     ex:"<ol>\n  <li>Book a site visit</li>\n  <li>Choose your unit\n    <ul>\n      <li>2 BHK</li>\n      <li>3 BHK</li>\n    </ul>\n  </li>\n  <li>Pay the booking amount</li>\n</ol>",
+     bad:"Putting the inner <ul> after the </li>, directly inside the outer list. A list may only contain li elements.",
+     work:"The \"How to book\" and \"Payment plan\" sections on project pages are ordered lists."},
+    {t:"Text-level tags", body:"strong marks something important (shown bold). em marks stress in a sentence (shown italic). br is a line break inside one block, used for addresses and poems, never for spacing. address holds contact details.",
+     ex:"<p>Possession <strong>December 2027</strong>. Prices are <em>inclusive</em> of GST.</p>\n<address>\n  <strong>Raghava Projects</strong><br>\n  Financial District<br>\n  Hyderabad 500032\n</address>",
+     bad:"Using <br><br> to add space between paragraphs. Use separate <p> tags and control spacing with CSS.",
+     work:"Every footer you've built has an address block like this."}],
+   quiz:[
+    {t:"read", q:"How many real list items does this list have?", code:"<ul>\n  <li>Pool</li>\n  <li>Gym</li>\n  <p>Spa</p>\n</ul>", opts:["2, and the <p> is invalid inside a <ul>","3","1","0"], a:0,
+     why:"A ul may only contain li. Browsers still show Spa, but it isn't a list item, so screen readers announce 2 items."},
+    {t:"bug", q:"Which heading order is valid?", opts:["h1, h2, h3, h2, h3","h1, h3, h2","h2, h1, h3","h1, h1, h2"], a:0,
+     why:"Going down one level at a time and back up to any level is fine. Skipping down (h1 → h3) or two h1s isn't."}],
+   drills:[
+    {id:"d1-fix", title:"Fix the broken markup", brief:"This code has 3 bugs. Find and fix all of them without changing the words.",
+     html:"<h1>Iris by Raghava</h2>\n<p>Homes from <strong>₹1.4 Cr</p></strong>\n<ul>\n  <li>Sky lounge\n  <li>Infinity pool</li>\n</ul>\n",
+     tests:[["The h1 closes with </h1>", (d,w,s)=>/<h1>[^<]*<\/h1>/.test(s.html)],
+            ["strong closes before the p does", (d,w,s)=>/<strong>[^<]*<\/strong>\s*<\/p>/.test(s.html)],
+            ["Every <li> has its own </li>", (d,w,s)=>(s.html.match(/<li>/g)||[]).length===(s.html.match(/<\/li>/g)||[]).length],
+            ["The words are unchanged", d=>txt($(d,"h1"))==="Iris by Raghava" && H(d,"li").length===2]]},
+    {id:"d1-steps", title:"Steps to book a visit", brief:"Under an <h2> \"How to book\", write an ordered list of at least 4 steps. One step must contain a nested bulleted list with 2+ options.",
+     html:"<h1>Wave by Raghava</h1>\n", 
+     tests:[["An <h2> that says How to book", d=>H(d,"h2").some(h=>/how to book/i.test(txt(h)))],
+            ["An <ol> with 4+ steps", d=>!!$(d,"ol") && H(d,"ol > li").length>=4],
+            ["The list comes after that heading", d=>{const h=H(d,"h2").find(h=>/how to book/i.test(txt(h))); return !!h && !!(h.compareDocumentPosition($(d,"ol")) & 4);}],
+            ["One step holds a nested <ul> with 2+ items", d=>H(d,"ol > li > ul").some(u=>u.querySelectorAll(":scope > li").length>=2)],
+            ["No empty or placeholder steps", d=>H(d,"ol > li").every(li=>words(li.firstChild ? li.firstChild.textContent : "")>=2 || words(txt(li))>=2)]]},
+    {id:"d1-contact", title:"The contact block", brief:"Build a footer contact block: an <address> with the company name in <strong> and 3 lines separated by <br>. Above it, a paragraph with the possession date in <strong> and one stressed word in <em>.",
+     html:"",
+     tests:[["A paragraph with <strong> and <em>", d=>H(d,"p").some(p=>p.querySelector("strong") && p.querySelector("em"))],
+            ["An <address> block", d=>!!$(d,"address")],
+            ["The company name is in <strong> inside it", d=>!!$(d,"address strong") && words(txt($(d,"address strong")))>=1],
+            ["At least 2 <br> line breaks in the address", d=>H(d,"address br").length>=2],
+            ["No <br><br> used for spacing", (d,w,s)=>!/<br\s*\/?>\s*<br/i.test(s.html)]]},
+    {id:"d1-page", title:"A project page from a brief", brief:"From a blank file: an h1 project name; an intro paragraph of 15+ words; then three h2 sections: Amenities (a list of 5+), Location (a paragraph), Floor plans (2+ h3 configurations, each followed by a paragraph). No skipped levels, no empty tags.",
+     html:"",
+     tests:[["Exactly one <h1>", d=>H(d,"h1").length===1],
+            ["An intro paragraph of 15+ words right after the h1", d=>{const n=$(d,"h1") && $(d,"h1").nextElementSibling; return !!n && n.tagName==="P" && words(txt(n))>=15;}],
+            ["h2 sections: Amenities, Location, Floor plans", d=>{const t=H(d,"h2").map(h=>txt(h).toLowerCase()); return ["amenities","location","floor plans"].every(x=>t.some(y=>y.includes(x)));}],
+            ["Amenities list has 5+ items", d=>H(d,"ul > li, ol > li").length>=5],
+            ["2+ h3 configurations, each followed by a <p>", d=>{const h=H(d,"h3"); return h.length>=2 && h.every(x=>x.nextElementSibling && x.nextElementSibling.tagName==="P");}],
+            ["No heading skips a level", d=>{let prev=0; for(const h of H(d,"h1,h2,h3,h4,h5,h6")){const l=+h.tagName[1]; if(l>prev+1) return false; prev=l;} return prev>0;}],
+            ["No empty elements", d=>H(d,"h1,h2,h3,p,li").every(e=>txt(e).length>0)]]}]},
+ { brief:[
+    {t:"Links that leave the site", body:"tel: and mailto: links open the phone dialer and email app. A link to another site can open in a new tab with target=\"_blank\"; add rel=\"noopener\" so the new tab can't control your page.",
+     ex:"<a href=\"tel:+914012345678\">Call sales</a>\n<a href=\"mailto:sales@example.com\">Email us</a>\n<a href=\"https://maps.google.com/?q=Kokapet\"\n   target=\"_blank\" rel=\"noopener\">Open in Maps</a>",
+     bad:"target=\"_blank\" without rel=\"noopener\". It's a known security hole on older browsers.",
+     work:"The WhatsApp, call and Google Maps buttons on your landing pages are exactly these."},
+    {t:"Figures and captions", body:"figure groups an image with its caption; figcaption is the visible caption. alt still describes the image for people who can't see it; the caption adds context for everyone.",
+     ex:"<figure>\n  <img src=\"lobby.jpg\" alt=\"Double-height lobby with marble floors\">\n  <figcaption>Grand entrance lobby, Tower A</figcaption>\n</figure>",
+     bad:"Copying the caption into the alt word for word. Screen readers then read the same text twice.",
+     work:"Project galleries and amenity cards are figure + figcaption in disguise."}],
+   quiz:[
+    {t:"read", q:"What does rel=\"noopener\" protect against?", opts:["The new tab controlling your page through window.opener","Slow loading","Google not indexing the link","Broken images"], a:0,
+     why:"Without it, the opened page can redirect your original tab. noopener cuts that link."},
+    {t:"bug", q:"Two sections both have id=\"plans\". What happens when you click href=\"#plans\"?", opts:["It jumps to the first one, and the page is invalid","It jumps to the second one","It shows both","The browser shows an error"], a:0,
+     why:"ids must be unique. Browsers pick the first match and quietly ignore the rest."}],
+   drills:[
+    {id:"d2-nav", title:"A working menu", brief:"Build a header with a nav holding a list of 4 links: Amenities, Location, Floor plans, Enquire. Each must jump to its own section further down, and each section needs an h2.",
+     html:"",
+     tests:[["A <nav> inside a <header>", d=>!!$(d,"header nav")],
+            ["The nav uses a list with 4 links", d=>H(d,"nav li a").length===4],
+            ["Every link starts with #", d=>H(d,"nav a").length>0 && H(d,"nav a").every(a=>(a.getAttribute("href")||"").startsWith("#"))],
+            ["Every link has a matching section", d=>H(d,"nav a").length>0 && H(d,"nav a").every(a=>{const t=d.getElementById((a.getAttribute("href")||"").slice(1)); return t && t.tagName==="SECTION";})],
+            ["Every section has an h2", d=>H(d,"section").length>=4 && H(d,"section").every(s=>s.querySelector("h2"))],
+            ["No id is used twice", d=>{const ids=H(d,"[id]").map(e=>e.id); return new Set(ids).size===ids.length;}]]},
+    {id:"d2-contact", title:"Call, email, directions", brief:"Add three links: a phone link (tel:), an email link (mailto:), and a Google Maps link that opens in a new tab safely.",
+     html:"<h2>Visit the site office</h2>\n",
+     tests:[["A tel: link", d=>!!$(d,'a[href^="tel:"]')],
+            ["The phone number has no spaces in the href", d=>!!$(d,'a[href^="tel:"]') && !/\s/.test($(d,'a[href^="tel:"]').getAttribute("href"))],
+            ["A mailto: link", d=>!!$(d,'a[href^="mailto:"]')],
+            ["An https:// link with target=\"_blank\"", d=>!!$(d,'a[href^="https://"][target="_blank"]')],
+            ["…and rel=\"noopener\"", d=>{const a=$(d,'a[href^="https://"][target="_blank"]'); return !!a && /noopener/.test(a.getAttribute("rel")||"");}]]},
+    {id:"d2-gallery", title:"Gallery with captions", brief:"Build a gallery of 3 figures. Each has an img (any src) with a descriptive alt, and a figcaption. All three alts must be different, and no alt may just repeat its caption.",
+     html:"<h2>Gallery</h2>\n",
+     tests:[["3 <figure> elements", d=>H(d,"figure").length>=3],
+            ["Each figure has an img and a figcaption", d=>H(d,"figure").length>=3 && H(d,"figure").every(f=>f.querySelector("img") && f.querySelector("figcaption"))],
+            ["Every alt is 4+ words", d=>H(d,"figure img").length>=3 && H(d,"figure img").every(i=>words(i.getAttribute("alt"))>=4)],
+            ["All alts are different", d=>{const a=H(d,"figure img").map(i=>(i.getAttribute("alt")||"").toLowerCase()); return a.length>=3 && new Set(a).size===a.length;}],
+            ["No alt just repeats its caption", d=>H(d,"figure").every(f=>{const i=f.querySelector("img"),c=f.querySelector("figcaption"); return !i||!c|| (i.getAttribute("alt")||"").trim().toLowerCase()!==txt(c).toLowerCase();})]]},
+    {id:"d2-debug", title:"Fix the broken page", brief:"A client says the menu and two buttons don't work. There are 4 bugs. Fix them all.",
+     html:"<nav>\n  <a href=\"amenities\">Amenities</a>\n  <a href=\"#Location\">Location</a>\n  <a href=\"#plans\">Floor plans</a>\n</nav>\n<section id=\"amenities\"><h2>Amenities</h2></section>\n<section id=\"location\"><h2>Location</h2></section>\n<section id=\"floor-plans\"><h2>Floor plans</h2></section>\n<img src=\"lobby.jpg\">\n<a href=\"https://wa.me/914012345678\" target=\"_blank\">WhatsApp us</a>\n",
+     tests:[["Every menu link is a # link", d=>H(d,"nav a").every(a=>(a.getAttribute("href")||"").startsWith("#"))],
+            ["Every menu link lands on a section", d=>H(d,"nav a").length===3 && H(d,"nav a").every(a=>!!d.getElementById((a.getAttribute("href")||"").slice(1)))],
+            ["The image has a 4+ word alt", d=>!!$(d,"img") && words($(d,"img").getAttribute("alt"))>=4],
+            ["The WhatsApp link opens safely", d=>{const a=$(d,'a[target="_blank"]'); return !!a && /noopener/.test(a.getAttribute("rel")||"");}]]}]},
+ { brief:[
+    {t:"Shorthand values", body:"margin and padding take 1 to 4 values. One value: all sides. Two: top/bottom, then left/right. Four: top, right, bottom, left, clockwise from the top.",
+     ex:"padding: 24px;            /* all sides */\npadding: 12px 24px;       /* top+bottom, left+right */\nmargin: 0 0 16px 0;       /* top right bottom left */\nborder-radius: 12px;",
+     bad:"Reading four values as left, right, top, bottom. It's always clockwise from the top.",
+     work:"Tailwind's py-3 px-6 is exactly padding: 12px 24px."},
+    {t:"Typography", body:"font-size sets the size and font-weight the thickness: 400 is normal, 700 is bold. font-family takes a list: your font first, then fallbacks, ending with a generic family like sans-serif. line-height without a unit (1.6) scales with the font size. Set sizes for h1, h2 and p once and reuse them.",
+     ex:"body {\n  font-family: \"Manrope\", Arial, sans-serif;\n  font-size: 16px;\n  line-height: 1.6;\n  color: #444;\n}\nh1 { font-size: 40px; font-weight: 700; line-height: 1.15; }",
+     bad:"line-height: 16px on body text. Every bigger heading then has its lines crushed together.",
+     work:"The Manrope + Cormorant pairing on Muppa Melody is set up exactly like this."}],
+   quiz:[
+    {t:"read", q:"Which colour wins?", code:"#hero h1 { color: red; }\n.title { color: blue; }\n\n<section id=\"hero\">\n  <h1 class=\"title\">Iris</h1>\n</section>", opts:["Red: the id makes that selector more specific","Blue: it comes later","Blue: a class on the element always wins","Black"], a:0,
+     why:"#hero h1 has an id in it, which beats a single class, even though the class targets the h1 directly."},
+    {t:"read", q:"margin: 10px 20px; means…", opts:["10px top and bottom, 20px left and right","10px left and right, 20px top and bottom","10px on top, 20px everywhere else","10px, then 20px on the next element"], a:0,
+     why:"Two values: vertical first, then horizontal."}],
+   drills:[
+    {id:"d3-spec", title:"Win without !important", brief:"The price should be the brand blue #1F4E79, but the first rule beats it. Make it blue without !important and without deleting or editing the first rule.",
+     html:"<div class=\"card\">\n  <p>3 BHK · 1,850 sq ft</p>\n  <p class=\"price\">₹2.1 Cr onwards</p>\n</div>\n", css:".card p { color: #555; }\n\n.price { color: #1F4E79; } /* why doesn't this win? */\n",
+     tests:[["The price is #1F4E79", (d,w)=>w.getComputedStyle($(d,".price")).color===BLUE],
+            ["The other paragraph stays grey", (d,w)=>w.getComputedStyle($(d,"p")).color==="rgb(85, 85, 85)"],
+            ["No !important", (d,w,s)=>!/!important/.test(s.css)],
+            ["The first rule is untouched", (d,w,s)=>/\.card p\s*\{\s*color:\s*#555;\s*\}/.test(s.css)]]},
+    {id:"d3-stack", title:"Space the cards", brief:"Give each .card 20px padding, 12px rounded corners and a 1px border. Put exactly 16px between cards, but no margin under the last one.",
+     html:"<div class=\"card\">2 BHK · 1,250 sq ft</div>\n<div class=\"card\">3 BHK · 1,850 sq ft</div>\n<div class=\"card\">4 BHK · 2,600 sq ft</div>\n", css:"",
+     tests:[["20px padding", (d,w)=>H(d,".card").every(c=>w.getComputedStyle(c).padding==="20px")],
+            ["12px rounded corners", (d,w)=>H(d,".card").every(c=>w.getComputedStyle(c).borderTopLeftRadius==="12px")],
+            ["A 1px border", (d,w)=>H(d,".card").every(c=>w.getComputedStyle(c).borderTopWidth==="1px")],
+            ["Exactly 16px between cards", d=>{const c=H(d,".card").map(x=>x.getBoundingClientRect()); return Math.round(c[1].top-c[0].bottom)===16 && Math.round(c[2].top-c[1].bottom)===16;}],
+            ["No margin under the last card", (d,w)=>w.getComputedStyle(H(d,".card")[2]).marginBottom==="0px"]]},
+    {id:"d3-type", title:"A type system", brief:"Set body text to 16px, line-height 1.6, colour #444, with a font list ending in sans-serif. Make h1 40px and h2 28px, both in #1F4E79.",
+     html:"<h1>Muppa Melody</h1>\n<p>Gated villas in Kollur, 15 minutes from the Financial District.</p>\n<h2>Amenities</h2>\n<p>Clubhouse, pool, tennis court and a 1 km jogging track.</p>\n", css:"",
+     tests:[["Paragraphs are 16px", (d,w)=>px(w,$(d,"p"),"fontSize")===16],
+            ["Line height is 1.6 (25.6px)", (d,w)=>Math.abs(px(w,$(d,"p"),"lineHeight")-25.6)<0.2],
+            ["Text colour is #444", (d,w)=>w.getComputedStyle($(d,"p")).color==="rgb(68, 68, 68)"],
+            ["The font list ends in sans-serif", (d,w)=>/sans-serif\s*$/.test(w.getComputedStyle($(d,"p")).fontFamily)],
+            ["h1 is 40px, h2 is 28px", (d,w)=>px(w,$(d,"h1"),"fontSize")===40 && px(w,$(d,"h2"),"fontSize")===28],
+            ["Headings are #1F4E79", (d,w)=>w.getComputedStyle($(d,"h1")).color===BLUE && w.getComputedStyle($(d,"h2")).color===BLUE]]},
+    {id:"d3-debug", title:"Fix the broken stylesheet", brief:"Four styles here don't work. Find the 4 bugs and fix them.",
+     html:"<div class=\"card\">\n  <h2>Iris by Raghava</h2>\n  <p class=\"price\">₹1.8 Cr onwards</p>\n</div>\n",
+     css:".card {\n  padding 24px;\n  border: 1px solid #ddd\n  border-radius: 12px;\n}\nprice {\n  font-size: 28px;\n}\n.card h2 { colour: #1F4E79; }\n",
+     tests:[["Card padding is 24px", (d,w)=>w.getComputedStyle($(d,".card")).paddingTop==="24px"],
+            ["Card has a 1px border", (d,w)=>w.getComputedStyle($(d,".card")).borderTopWidth==="1px"],
+            ["Card corners are 12px", (d,w)=>w.getComputedStyle($(d,".card")).borderTopLeftRadius==="12px"],
+            ["The price is 28px", (d,w)=>px(w,$(d,".price"),"fontSize")===28],
+            ["The heading is #1F4E79", (d,w)=>w.getComputedStyle($(d,"h2")).color===BLUE]]}]},
+ { brief:[
+    {t:"Equal columns with flex: 1", body:"flex: 1 on every item tells them to share the free space equally, so three items become three equal columns whatever their content. flex: 1 1 200px means grow, shrink, and start from 200px.",
+     ex:".plans { display: flex; gap: 20px; }\n.plan  { flex: 1; }\n\n.footer { display: flex; flex-wrap: wrap; gap: 24px; }\n.col    { flex: 1 1 200px; } /* wraps when there's no room */",
+     bad:"Setting width: 33% on each item and adding a gap. The total goes over 100% and the last one wraps.",
+     work:"The floor-plan cards and 3-column footers on your sites work like this."},
+    {t:"Flex inside flex", body:"An item can be a flex container itself. A row of cards can hold cards that each stack their content in a column with flex-direction: column.",
+     ex:".feature { display: flex; gap: 24px; }\n.feature .text {\n  display: flex;\n  flex-direction: column;\n  gap: 8px;\n}",
+     bad:"Trying to do the whole layout with one flex container. Build it in layers: rows, then columns inside them.",
+     work:"Every \"image on the left, text on the right\" section is a flex row with a column inside."}],
+   quiz:[
+    {t:"read", q:"Three items have flex: 1 in a 600px container with no gap. How wide is each?", opts:["200px","1px","600px","It depends on the text"], a:0,
+     why:"flex: 1 starts each at 0 and shares all the space equally."},
+    {t:"bug", q:"align-items: center is set on .hero, but nothing moves vertically. Most likely…", opts:["The container has no extra height to centre in","align-items only works in grid","You also need justify-content","Text can't be centred"], a:0,
+     why:"If .hero is only as tall as its content, there's no room to move. Give it a height."}],
+   drills:[
+    {id:"d4-plans", title:"Three equal plan cards", brief:"Lay out the 3 .plan cards in one row with a 20px gap. They must all be exactly the same width, even though their text lengths differ.",
+     html:"<div class=\"plans\">\n  <div class=\"plan\">2 BHK<br>1,250 sq ft</div>\n  <div class=\"plan\">3 BHK with study<br>1,850 sq ft</div>\n  <div class=\"plan\">4 BHK duplex penthouse<br>2,600 sq ft</div>\n</div>\n",
+     css:".plan { padding: 16px; border: 1px solid #999; border-radius: 10px; }\n",
+     tests:[["All cards on one row", d=>new Set(H(d,".plan").map(p=>Math.round(p.getBoundingClientRect().top))).size===1],
+            ["All exactly the same width", d=>{const w=H(d,".plan").map(p=>p.getBoundingClientRect().width); return Math.max(...w)-Math.min(...w)<1;}],
+            ["20px between cards", d=>{const r=H(d,".plan").map(p=>p.getBoundingClientRect()); return Math.round(r[1].left-r[0].right)===20 && Math.round(r[2].left-r[1].right)===20;}],
+            ["They fill the full width", d=>{const c=$(d,".plans").getBoundingClientRect(),r=H(d,".plan").map(p=>p.getBoundingClientRect()); return Math.abs(r[0].left-c.left)<1 && Math.abs(c.right-r[2].right)<1;}]]},
+    {id:"d4-feature", title:"Image left, text right", brief:"Put .media and .text side by side with a 24px gap, vertically centred. Inside .text, stack the h3, p and link in a column with 8px between them.",
+     html:"<section class=\"feature\">\n  <div class=\"media\"></div>\n  <div class=\"text\">\n    <h3>Sky lounge</h3>\n    <p>A 40th-floor lounge with views across the city.</p>\n    <a href=\"#plans\">See floor plans</a>\n  </div>\n</section>\n",
+     css:".media { width: 160px; height: 200px; background: #cbd5e1; border-radius: 12px; flex-shrink: 0; }\nh3, p { margin: 0; }\n",
+     tests:[["Image and text side by side", d=>Math.round($(d,".text").getBoundingClientRect().left)>=Math.round($(d,".media").getBoundingClientRect().right)],
+            ["24px between them", d=>Math.round($(d,".text").getBoundingClientRect().left-$(d,".media").getBoundingClientRect().right)===24],
+            ["The text is vertically centred", d=>{const m=$(d,".media").getBoundingClientRect(),t=$(d,".text").getBoundingClientRect(); return Math.abs((m.top+m.height/2)-(t.top+t.height/2))<=2;}],
+            [".text is a flex column", (d,w)=>{const s=w.getComputedStyle($(d,".text")); return s.display==="flex" && s.flexDirection==="column";}],
+            ["8px between the h3, p and link", (d,w)=>w.getComputedStyle($(d,".text")).rowGap==="8px"]]},
+    {id:"d4-footer", title:"A footer that wraps", brief:"Make the 3 .col columns share the row, each starting at 200px, with a 24px gap. In this 500px-wide footer, the third column must drop to a new line by itself.",
+     html:"<footer class=\"footer\">\n  <div class=\"col\"><strong>Raghava Projects</strong><br>Financial District, Hyderabad</div>\n  <div class=\"col\"><strong>Projects</strong><br>Iris · Wave · Linq</div>\n  <div class=\"col\"><strong>Contact</strong><br>sales@example.com</div>\n</footer>\n",
+     css:".footer { width: 500px; padding: 16px; background: #eef1f6; box-sizing: border-box; }\n",
+     tests:[[".footer is a wrapping flex row", (d,w)=>{const s=w.getComputedStyle($(d,".footer")); return s.display==="flex" && s.flexWrap==="wrap";}],
+            ["24px gap", (d,w)=>w.getComputedStyle($(d,".footer")).columnGap==="24px"],
+            ["Each column starts at 200px", (d,w)=>H(d,".col").every(c=>w.getComputedStyle(c).flexBasis==="200px")],
+            ["Two columns on the first row", d=>{const t=H(d,".col").map(c=>Math.round(c.getBoundingClientRect().top)); return t[0]===t[1];}],
+            ["The third wraps and fills its row", d=>{const c=H(d,".col").map(x=>x.getBoundingClientRect()),f=$(d,".footer").getBoundingClientRect(); return c[2].top>c[0].top && c[2].width>f.width-40;}]]},
+    {id:"d4-debug", title:"Fix the header", brief:"The client says the header is broken: the menu isn't on the right, items aren't centred, and the links touch each other. Fix the CSS (4 bugs).",
+     html:"<header class=\"bar\">\n  <span class=\"logo\">IRIS</span>\n  <nav class=\"links\">\n    <a href=\"#amenities\">Amenities</a>\n    <a href=\"#plans\">Plans</a>\n    <a href=\"#enquire\">Enquire</a>\n  </nav>\n</header>\n",
+     css:".bar { padding: 16px; background: #eef1f6; height: 72px; box-sizing: border-box; }\n.logo { font-size: 24px; font-weight: 800; }\n.logo, .links a { display: flex; }\n.bar { justify-items: space-between; align-content: center; }\n.links { gap: 16 px; }\n",
+     tests:[["Logo left, links right, same row", d=>{const b=$(d,".bar").getBoundingClientRect(),l=$(d,".logo").getBoundingClientRect(),n=$(d,".links").getBoundingClientRect(); return l.left-b.left<=18 && b.right-n.right<=18 && Math.abs((l.top+l.height/2)-(n.top+n.height/2))<=2;}],
+            ["Everything vertically centred in the bar", d=>{const b=$(d,".bar").getBoundingClientRect(),l=$(d,".logo").getBoundingClientRect(); return Math.abs((b.top+b.height/2)-(l.top+l.height/2))<=2;}],
+            ["The links sit in a row", d=>new Set(H(d,".links a").map(a=>Math.round(a.getBoundingClientRect().top))).size===1],
+            ["16px between links", d=>{const a=H(d,".links a").map(x=>x.getBoundingClientRect()); return Math.round(a[1].left-a[0].right)===16;}]]}]},
+ { brief:[
+    {t:"Before you call it done", body:"Professionals check their own work before anyone else sees it. Read the page with the CSS switched off: does it still make sense? Do all links land somewhere? Would the alt texts make sense read aloud?",
+     ex:"Checklist\n[ ] One h1, no skipped heading levels\n[ ] Every # link has a matching id\n[ ] Every image has a real alt\n[ ] External links: target + rel\n[ ] Spacing from CSS, not <br>\n[ ] No !important",
+     bad:"Calling it done because it looks right on your screen. The checks you can't see (links, alt, headings) are what clients and Google notice later.",
+     work:"This is the checklist to run before you send any landing page to a client."}],
+   quiz:[],
+   drills:[
+    {id:"d5-boss2", title:"Phase 2: the full landing page", brief:"Extend your skills into a whole page from blank: a header with a nav whose links all land on sections; a hero (h1, tagline, CTA styled as a button); Amenities as wrapping chips; 3 equal floor-plan cards in a row; a gallery of 2+ captioned figures; a contact footer with an address and a tel: link. No !important, no <br><br>.",
+     html:"", useCss:true, boss:true,
+     tests:[["header > nav with 3+ links that all land on sections", d=>{const a=H(d,"header nav a"); return a.length>=3 && a.every(x=>{const t=d.getElementById((x.getAttribute("href")||"").slice(1)); return t && t.tagName==="SECTION";});}],
+            ["Exactly one h1, no skipped levels", d=>{if(H(d,"h1").length!==1) return false; let p=0; for(const h of H(d,"h1,h2,h3,h4")){const l=+h.tagName[1]; if(l>p+1) return false; p=l;} return true;}],
+            ["A CTA link styled as a button", (d,w)=>H(d,'a[href^="#"]').some(a=>{const s=w.getComputedStyle(a); return parseFloat(s.paddingLeft)>=12 && s.backgroundColor!=="rgba(0, 0, 0, 0)" && s.textDecorationLine==="none";})],
+            ["Amenity chips in a wrapping flex row (5+)", (d,w)=>H(d,"ul,div").some(c=>{const s=w.getComputedStyle(c); return s.display==="flex" && s.flexWrap==="wrap" && c.children.length>=5;})],
+            ["3 equal-width cards in one row", d=>H(d,"*").some(c=>{const k=[...c.children]; if(k.length!==3) return false; const r=k.map(x=>x.getBoundingClientRect()); return new Set(r.map(x=>Math.round(x.top))).size===1 && Math.max(...r.map(x=>x.width))-Math.min(...r.map(x=>x.width))<1 && r[0].width>60;})],
+            ["2+ figures with real alts and captions", d=>{const f=H(d,"figure"); return f.length>=2 && f.every(x=>x.querySelector("figcaption") && words((x.querySelector("img")||{getAttribute:()=>""}).getAttribute("alt"))>=4);}],
+            ["A footer with an <address> and a tel: link", d=>!!$(d,"footer address") && !!$(d,'footer a[href^="tel:"]')],
+            ["No !important and no <br><br>", (d,w,s)=>!/!important/.test(s.css) && !/<br\s*\/?>\s*<br/i.test(s.html)]]}]}
+];
+
+/* Which briefing each question checks (in quiz order) and which briefings each drill needs */
+const QMAP = [
+  ["Headings are an outline","Nesting","Nesting","Headings are an outline","Elements and tags","Nesting","Lists inside lists","Headings are an outline"],
+  ["Images and alt text","Links and ids","Links and ids","Links and ids","Links and ids","Images and alt text","Links that leave the site","Links and ids"],
+  ["Selectors","Padding, border and margin","Which rule wins","How wide is a box?","Selectors","How CSS works","Which rule wins","Shorthand values"],
+  ["Flex containers","Gap, wrap and centring","The two directions","The two directions","Gap, wrap and centring","Gap, wrap and centring","Equal columns with flex: 1","Gap, wrap and centring"],
+  ["Plan before you type","Plan before you type","Plan before you type","Make a link look like a button"]];
+const USES = {
+  "d1-h1":["Headings are an outline"], "d1-tag":["Elements and tags"], "d1-list":["Nesting"], "d1-outline":["Headings are an outline"],
+  "d1-fix":["Elements and tags","Nesting"], "d1-steps":["Lists inside lists"], "d1-contact":["Text-level tags"], "d1-page":["Headings are an outline","Nesting"],
+  "d2-cta":["Links and ids"], "d2-img":["Images and alt text"], "d2-target":["Links and ids"], "d2-sem":["Tags with meaning"],
+  "d2-nav":["Tags with meaning","Links and ids"], "d2-contact":["Links that leave the site"], "d2-gallery":["Figures and captions","Images and alt text"], "d2-debug":["Links and ids","Images and alt text","Links that leave the site"],
+  "d3-color":["Selectors"], "d3-pad":["Padding, border and margin"], "d3-box":["How wide is a box?"], "d3-price":["Selectors","Typography"],
+  "d3-spec":["Selectors that look inside","Which rule wins"], "d3-stack":["Padding, border and margin","Selectors that look inside"], "d3-type":["Typography"], "d3-debug":["How CSS works","Selectors","Padding, border and margin"],
+  "d4-bar":["The two directions"], "d4-row":["Flex containers","Gap, wrap and centring"], "d4-centre":["Gap, wrap and centring"], "d4-wrap":["Gap, wrap and centring"],
+  "d4-plans":["Equal columns with flex: 1"], "d4-feature":["Flex inside flex","The two directions"], "d4-footer":["Equal columns with flex: 1","Gap, wrap and centring"], "d4-debug":["The two directions","Gap, wrap and centring"],
+  "d5-boss":["Plan before you type","Make a link look like a button"], "d5-boss2":["Plan before you type","Before you call it done"]};
+const BRIEF_ORDER = {2:["How CSS works","Selectors","Selectors that look inside","Which rule wins","Padding, border and margin","How wide is a box?","Shorthand values","Typography"]};
+
+DAYS.forEach((D,i)=>{
+  const M = MORE[i];
+  D.brief = D.brief.concat(M.brief);
+  D.quiz = D.quiz.concat(M.quiz);
+  D.drills = D.drills.concat(M.drills);
+  D.drills.forEach(dr=>{ if(EXTRA_TESTS[dr.id]) dr.tests = dr.tests.concat(EXTRA_TESTS[dr.id]); dr.uses = USES[dr.id] || []; });
+  D.quiz.forEach((q,k)=>{ q.b = QMAP[i][k]; });
+  if(BRIEF_ORDER[i]) D.brief = BRIEF_ORDER[i].map(t=>D.brief.find(b=>b.t===t));
+});
+const BRIEFS = {}; DAYS.forEach(D=>D.brief.forEach(b=>{ BRIEFS[b.t] = b; }));
+/* Deep lessons: why → explanation → annotated example → try it → questions.
+   ex rows are [code line, what it means]. */
+const LESSONS = {
+ 0: [
+  {t:"What HTML is", why:"A browser can't guess what your text is. HTML labels every piece (this is a heading, this is a paragraph, this is a list) so the browser knows how to show it, Google knows what matters, and screen readers know how to read it aloud.",
+   body:["An HTML file is plain text. The browser reads it from top to bottom and turns each labelled piece into something on screen.",
+         "Each label is a tag: a name inside angle brackets. <p> means paragraph, <h1> means main heading.",
+         "Most tags come in pairs. The opening tag <p> starts it, the closing tag </p> (with a slash) ends it, and the text between them is the content. Opening tag + content + closing tag together are one element."],
+   diagram:"element",
+   ex:[["<h1>Wave by Raghava</h1>","An h1 element: the page's main heading"],
+       ["<p>Lakeside homes in Kokapet.</p>","A p element: one paragraph of text"]],
+   bad:"Forgetting the slash. <p>…<p> opens a second paragraph instead of closing the first one.",
+   work:"Every page you've shipped, Next.js ones included, reaches the browser as HTML like this.",
+   tryit:{id:"t1-first", title:"Your first two elements", brief:"Write an h1 that says Wave by Raghava. Under it, write a paragraph of at least 3 words.", html:"",
+     tests:[["An <h1> that says Wave by Raghava", d=>/wave\s+by\s+raghava/i.test(txt($(d,"h1")))],
+            ["A <p> after the h1 with 3+ words", d=>!!$(d,"p") && !!($(d,"h1").compareDocumentPosition($(d,"p")) & 4) && words(txt($(d,"p")))>=3],
+            ["Both are closed: </h1> and </p>", (d,w,s)=>/<\/h1>/.test(s.html) && /<\/p>/.test(s.html)]]},
+   quiz:[
+    {t:"recall", q:"What is an element?", opts:["Opening tag + content + closing tag","Just the <p> part","Any word on the page","A colour in CSS"], a:0,
+     why:"The tags are the labels; the element is the whole labelled piece, from <p> to </p>."},
+    {t:"recall", q:"What does the slash in </p> mean?", opts:["It closes the element","It's a comment","It makes text italic","It starts a new line"], a:0,
+     why:"A slash after < marks a closing tag. It must match the opening tag's name."},
+    {t:"bug", q:"What's wrong with this line?", code:"<h1>Iris by Raghava</h2>", opts:["The closing tag doesn't match the opening tag","An h1 can't hold text","Nothing, it works","It needs a class"], a:0,
+     why:"An element closes with the same name it opened with: <h1> … </h1>."}]},
+
+  {t:"Spaces, new lines and comments", why:"Beginners often press Enter in their HTML and are surprised nothing changes on screen. Knowing this rule saves a lot of confusion.",
+   body:["The browser collapses spaces, tabs and new lines inside text into a single space. How you type the file does not control the layout; elements do.",
+         "To show text on separate lines, put it in separate elements, for example one <p> per line.",
+         "Indenting your code (adding spaces at the start of lines) is only for humans, so you can see the structure. The browser ignores it.",
+         "A comment starts with <!-- and ends with -->. The browser ignores everything inside. Developers use comments to leave notes."],
+   ex:[["<p>Clubhouse","You pressed Enter after Clubhouse…"],
+       ["   Pool      Gym</p>","…then typed extra spaces"],
+       ["","On screen: Clubhouse Pool Gym (one line, single spaces)"],
+       ["<!-- Hero section starts here -->","A comment: a note for developers, never shown"]],
+   bad:"Pressing Enter twice to make a gap. It does nothing. Use another element now; later you'll add space with CSS.",
+   work:"The starter code in the drills uses <!-- comments --> to tell you what to write.",
+   tryit:{id:"t1-lines", title:"Three separate lines", brief:"On screen these show as one line. Make Clubhouse, Pool and Gym appear on three separate lines, using three paragraphs.", html:"<p>Clubhouse\nPool\nGym</p>\n",
+     tests:[["Three <p> elements", d=>H(d,"p").length===3],
+            ["One word in each: Clubhouse, Pool, Gym", d=>H(d,"p").map(p=>txt(p)).join("|")==="Clubhouse|Pool|Gym"]]},
+   quiz:[
+    {t:"read", q:"What shows on screen?", code:"<p>Ready      to\n\nmove</p>", opts:["Ready to move, on one line","Ready, a gap, then to move","Three separate paragraphs","Nothing"], a:0,
+     why:"All the spaces and new lines collapse into single spaces inside one paragraph."},
+    {t:"recall", q:"What does <!-- Hero --> do on the page?", opts:["Nothing visible; it's a note for developers","Shows the word Hero","Creates a hero section","Causes an error"], a:0,
+     why:"Comments are ignored by the browser. Only people reading the code see them."}]},
+
+  {t:"Nesting: elements inside elements", why:"Real content has parts inside parts: a price inside a sentence, items inside a list, a menu inside a header. Nesting is how HTML says \"this is part of that\".",
+   body:["An element can contain other elements. The outer one is the parent; the ones inside are its children.",
+         "Always close a child before its parent, like closing the inner box before the outer box.",
+         "Indent each child by two spaces so the structure is easy to see. The browser doesn't care, but you and your team will."],
+   ex:[["<p>","Parent: a paragraph opens"],
+       ["  From <strong>₹1.2 Cr</strong> onwards","Child: strong sits inside p (indented 2 spaces)"],
+       ["</p>","The parent closes last"],
+       ["",""],
+       ["p","The same thing drawn as a tree:"],
+       ["├── \"From \"","  text"],
+       ["├── strong → \"₹1.2 Cr\"","  a child element"],
+       ["└── \" onwards\"","  more text"]],
+   bad:"<p><strong>₹1.2 Cr</p></strong> closes the parent first. The browser has to guess what you meant, and it often guesses wrong.",
+   work:"Your Next.js components are nesting too: a header holds a nav, which holds the links.",
+   tryit:{id:"t1-nest", title:"Make the price bold", brief:"Wrap ₹1.2 Cr in <strong> so it shows bold. Keep every other word the same.", html:"<p>Homes from ₹1.2 Cr onwards</p>\n",
+     tests:[["A <strong> inside the paragraph", d=>!!$(d,"p strong")],
+            ["The strong holds exactly ₹1.2 Cr", d=>txt($(d,"p strong"))==="₹1.2 Cr"],
+            ["The sentence is unchanged", d=>txt($(d,"p")).replace(/\s+/g," ")==="Homes from ₹1.2 Cr onwards"],
+            ["strong closes before p", (d,w,s)=>/<\/strong>[^<]*<\/p>/.test(s.html)]]},
+   quiz:[
+    {t:"recall", q:"In <p>From <strong>₹1.2 Cr</strong></p>, which element is the parent?", opts:["The p","The strong","₹1.2 Cr","Neither"], a:0,
+     why:"The p contains the strong, so p is the parent and strong is its child."},
+    {t:"bug", q:"What's wrong here?", code:"<p><strong>Ready to move</p></strong>", opts:["The tags close in the wrong order","strong can't go inside p","The p needs a class","Nothing"], a:0,
+     why:"strong opened last, so it must close first: <p><strong>Ready to move</strong></p>."}]},
+
+  {t:"Headings: the outline of a page", why:"People scan before they read. Google and screen readers jump from heading to heading. A clean outline makes the page understandable in seconds.",
+   body:["There are six heading levels, h1 to h6. Think of them as a table of contents.",
+         "h1 is the page's main title. Use exactly one. h2 starts each main section. h3 is a sub-section inside an h2, and so on.",
+         "Going down, move one level at a time: h1 → h2 → h3. Going back up, you can jump any number of levels: h3 → h2 is fine.",
+         "Never choose a heading because of its size. You'll change sizes with CSS later; the level is about meaning."],
+   ex:[["<h1>Wave by Raghava</h1>","Level 1: the page title (only one per page)"],
+       ["<h2>Amenities</h2>","Level 2: a main section"],
+       ["<h3>Clubhouse</h3>","Level 3: inside Amenities"],
+       ["<h3>Pool</h3>","Another level 3, still inside Amenities"],
+       ["<h2>Location</h2>","Back up to level 2: a new main section starts"]],
+   bad:"Jumping from h1 straight to h3 because h3 \"looks the right size\". Google and screen readers read that as a missing level.",
+   work:"This is the strict h1 → h2 → h3 rule you used on the Muppa Melody page.",
+   tryit:{id:"t1-levels", title:"Fix one level", brief:"Amenities is a main section, but it's marked as h3. Fix it.", html:"<h1>Iris by Raghava</h1>\n<h3>Amenities</h3>\n<p>Sky lounge, pool, gym.</p>\n",
+     tests:[["Amenities is an h2", d=>H(d,"h2").some(h=>txt(h)==="Amenities")],
+            ["No h3 is left", d=>H(d,"h3").length===0]]},
+   quiz:[
+    {t:"recall", q:"How many <h1> tags should one page normally have?", opts:["One","One per section","As many as you like","None"], a:0,
+     why:"The h1 is the page's main title. One keeps the outline clear."},
+    {t:"read", q:"In this outline, which heading sits inside the Amenities section?", code:"<h1>Iris by Raghava</h1>\n<h2>Amenities</h2>\n<h3>Sky lounge</h3>\n<h2>Location</h2>", opts:["Sky lounge","Iris by Raghava","Location","None of them"], a:0,
+     why:"An h3 belongs to the nearest h2 above it. Location is a new h2, so it starts a new section."},
+    {t:"bug", q:"Which heading order is valid?", opts:["h1, h2, h3, h2, h3","h1, h3, h2","h2, h1, h3","h1, h1, h2"], a:0,
+     why:"Down one level at a time, back up to any level, and only one h1."}]},
+
+  {t:"Lists", why:"Amenities, highlights, booking steps: real-estate pages are full of lists. Marking them as lists lets screen readers announce \"list, 5 items\" and keeps them easy to style.",
+   body:["ul is an unordered list, shown with bullets. Use it when the order doesn't matter, like amenities.",
+         "ol is an ordered list, shown with numbers. Use it when order matters, like steps.",
+         "Each item is an li (list item). A ul or ol may only contain li elements directly. Anything else goes inside an li.",
+         "An li can hold a whole new list for sub-points. The inner list goes inside the li, before its </li>."],
+   ex:[["<ol>","An ordered (numbered) list"],
+       ["  <li>Book a site visit</li>","Item 1"],
+       ["  <li>Choose your unit","Item 2 starts…"],
+       ["    <ul>","…and holds a bulleted sub-list"],
+       ["      <li>2 BHK</li>","Sub-item"],
+       ["      <li>3 BHK</li>","Sub-item"],
+       ["    </ul>","The sub-list closes"],
+       ["  </li>","Then item 2 closes"],
+       ["</ol>","The whole list closes last"]],
+   bad:"Putting a <p> or an inner <ul> directly inside a list, outside any li. Lists may only contain li.",
+   work:"Every amenities list and \"How to book\" section you've built is a ul or ol.",
+   tryit:{id:"t1-ul", title:"Three amenities", brief:"Write a bulleted list of 3 amenities. Each item should be a real feature of 2+ words, like Rooftop infinity pool.", html:"",
+     tests:[["A <ul>", d=>!!$(d,"ul")],
+            ["3+ list items", d=>H(d,"ul > li").length>=3],
+            ["Each item is 2+ real words", d=>H(d,"ul > li").length>0 && H(d,"ul > li").every(li=>words(txt(li))>=2 && !lazy(txt(li)))]]},
+   quiz:[
+    {t:"recall", q:"Which tag makes a numbered list?", opts:["<ol>","<ul>","<li>","<list>"], a:0,
+     why:"ol = ordered list (numbers). ul = unordered (bullets). li = one item in either."},
+    {t:"read", q:"How many real list items does this list have?", code:"<ul>\n  <li>Pool</li>\n  <li>Gym</li>\n  <p>Spa</p>\n</ul>", opts:["2, and the <p> is invalid inside a <ul>","3","1","0"], a:0,
+     why:"A ul may only contain li. Spa still shows, but it isn't a list item."}]},
+
+  {t:"Text-level tags", why:"Inside a paragraph, some words matter more than others, and some text, like an address, has its own shape. These small tags handle that.",
+   body:["strong marks important words. Browsers show it bold.",
+         "em marks stress, the word you'd say with emphasis. Browsers show it italic.",
+         "br is a line break inside one block of text. It has no closing tag. Use it where the line break is part of the content, like an address. Never use it to add space.",
+         "address holds contact details for the page or company."],
+   ex:[["<p>Possession <strong>December 2027</strong>.</p>","strong: an important fact"],
+       ["<p>Prices are <em>inclusive</em> of GST.</p>","em: the stressed word"],
+       ["<address>","Contact details start"],
+       ["  <strong>Raghava Projects</strong><br>","Company name, then a line break"],
+       ["  Financial District<br>","Line 2, then a break"],
+       ["  Hyderabad 500032","Line 3"],
+       ["</address>","Contact details end"]],
+   bad:"Using <br><br> to create space between paragraphs. Use separate <p> elements; spacing comes from CSS.",
+   work:"Every footer you've built has an address block like this.",
+   tryit:{id:"t1-addr", title:"Break the address into lines", brief:"This address shows on one line. Add <br> so it shows on three lines.", html:"<address>\n  Raghava Projects\n  Financial District\n  Hyderabad 500032\n</address>\n",
+     tests:[["Exactly 2 <br> in the address", d=>H(d,"address br").length===2],
+            ["The text is unchanged", d=>txt($(d,"address")).replace(/\s+/g," ")==="Raghava Projects Financial District Hyderabad 500032"]]},
+   quiz:[
+    {t:"recall", q:"Which tag marks important words?", opts:["<strong>","<em>","<br>","<address>"], a:0,
+     why:"strong = important. em = stressed. br = line break. address = contact details."},
+    {t:"recall", q:"When should you use <br>?", opts:["Inside one block, like the lines of an address","To add space between paragraphs","At the end of every sentence","Never"], a:0,
+     why:"br is for line breaks that belong to the content. Spacing between blocks is CSS's job."}]},
+
+  {t:"The full page skeleton", why:"Until now you've written only what goes inside the page. A real .html file has a fixed outer shell around it. Here the editor adds it for you, but in your own files you write it yourself.",
+   body:["Every HTML file has the same outer structure. The doctype line comes first, then an html element that holds two parts.",
+         "head holds information about the page that isn't shown on it: the character set and the title in the browser tab.",
+         "body holds everything visible. Everything you've written so far goes inside body.",
+         "Don't confuse <title> with <h1>. title is the browser tab and the blue link in Google results. h1 is the big heading people see on the page."],
+   ex:[["<!doctype html>","Tells the browser: this is modern HTML"],
+       ["<html lang=\"en\">","The root element; lang says the page is in English"],
+       ["  <head>","Information about the page (not shown)"],
+       ["    <meta charset=\"utf-8\">","Lets ₹ and other symbols display correctly"],
+       ["    <title>Wave by Raghava</title>","The browser tab and Google result title"],
+       ["  </head>",""],
+       ["  <body>","Everything visible goes here"],
+       ["    <h1>Wave by Raghava</h1>","The visible main heading"],
+       ["  </body>",""],
+       ["</html>","The root closes last"]],
+   bad:"Putting visible content inside <head>, or using <title> as if it were the page heading.",
+   work:"In Next.js, layout.tsx renders this shell for you, and the metadata export fills in the title.",
+   tryit:{id:"t1-shell", title:"Write a full page", brief:"Type a complete HTML file: doctype, html, head with a meta charset and a title, and a body with an h1. (The preview will look normal; the checks read your code.)", html:"",
+     tests:[["Starts with <!doctype html>", (d,w,s)=>/^\s*<!doctype html>/i.test(s.html)],
+            ["An <html> element with lang", (d,w,s)=>/<html[^>]*\blang=/i.test(s.html) && /<\/html>\s*$/i.test(s.html)],
+            ["A head with meta charset and a title", (d,w,s)=>/<head>[\s\S]*<meta charset=["']?utf-8["']?>[\s\S]*<title>[^<]+<\/title>[\s\S]*<\/head>/i.test(s.html)],
+            ["A body that holds an h1", (d,w,s)=>/<body>[\s\S]*<h1>[^<]+<\/h1>[\s\S]*<\/body>/i.test(s.html)],
+            ["head comes before body", (d,w,s)=>s.html.toLowerCase().indexOf("</head>")>-1 && s.html.toLowerCase().indexOf("</head>")<s.html.toLowerCase().indexOf("<body>")]]},
+   quiz:[
+    {t:"recall", q:"Where does the text inside <title> appear?", opts:["In the browser tab and Google results","As the big heading on the page","At the bottom of the page","Nowhere"], a:0,
+     why:"title belongs in head. The visible heading is the h1 in body."},
+    {t:"recall", q:"Which part holds everything people see?", opts:["<body>","<head>","<meta>","<title>"], a:0,
+     why:"head is information about the page; body is the page."}]}
+ ]
+};
+
+const GLOSSARY = {
+ 0: [["HTML","The language that labels each piece of a page so the browser knows what it is."],
+     ["Tag","A label in angle brackets, like <p>. The closing tag has a slash: </p>."],
+     ["Element","Opening tag + content + closing tag: the whole labelled piece."],
+     ["Content","What sits between the opening and closing tags."],
+     ["Nesting","Putting elements inside other elements."],
+     ["Parent / child","The outer element is the parent; elements inside it are its children."],
+     ["Indent","Spaces at the start of a line so you can see the structure. The browser ignores them."],
+     ["Comment","<!-- a note -->. Ignored by the browser."],
+     ["Heading level","h1 to h6: the page's outline. One h1; go down one level at a time."],
+     ["ul / ol / li","Bulleted list / numbered list / one list item."],
+     ["head / body","head: information about the page. body: everything visible."]]
+};
+
+const LESSON_USES = {
+  "d1-h1":["What HTML is","Headings: the outline of a page"], "d1-tag":["What HTML is"], "d1-list":["Lists"], "d1-outline":["Headings: the outline of a page"],
+  "d1-fix":["What HTML is","Nesting: elements inside elements","Lists"], "d1-steps":["Lists","Headings: the outline of a page"],
+  "d1-contact":["Text-level tags"], "d1-page":["Headings: the outline of a page","Lists","Nesting: elements inside elements"]};
+DAYS.forEach((D,i)=>{
+  if(!LESSONS[i]) return;
+  D.lessons = LESSONS[i]; D.brief = []; D.quiz = [];
+  D.lessons.forEach(L=>{ BRIEFS[L.t] = {t:L.t, body:L.why+" "+L.body.join(" "), ex:L.ex.map(r=>r[0]).join("\n")}; });
+  D.drills.forEach(dr=>{ if(LESSON_USES[dr.id]) dr.uses = LESSON_USES[dr.id]; });
+});
+
+
+/* What each road-map step gives you */
+const WEEK_INFO = [
+  {can:"Write clean, meaningful HTML and style it with CSS.", build:"A property hero section from a blank file.", topics:["Elements and nesting","Headings","Links and images","Semantic tags","Selectors","Specificity","Box model","Flexbox basics"]},
+  {can:"Build any landing-page layout and make it work on phones.", build:"A full landing page: hero, amenities grid, floor plans and footer, responsive.", topics:["Flexbox in depth","CSS Grid","Media queries","Mobile-first","rem, %, vw units","Responsive images"]},
+  {can:"Write small programs that store data, make decisions and repeat work.", build:"A price and EMI calculator.", topics:["Variables","Types","Functions","if / else","Arrays and loops","Objects"]},
+  {can:"Make pages interactive without any library.", build:"Floor-plan tabs, a gallery with a lightbox and a validated enquiry form.", topics:["Selecting elements","Events","Changing classes","Form validation","Building elements from data"]},
+  {can:"Track your code with Git, put sites live, and load data from an API.", build:"Your landing page live on Vercel, loading projects from a JSON file.", topics:["Terminal basics","Git commits and branches","GitHub","Vercel deploys","fetch and JSON","async / await"]},
+  {can:"Write your own server that answers requests.", build:"An API with routes for projects and enquiries.", topics:["How HTTP works","Node and npm","Express routes","Status codes","Environment variables"]},
+  {can:"Save data safely and keep secret keys out of the browser.", build:"A lead API that saves enquiries to a database and forwards them to a CRM.", topics:["SQL basics","SQLite / Postgres","Create, read, update, delete","Validation","Secrets and .env","Why API keys leak"]},
+  {can:"Build interfaces from reusable components.", build:"Your landing page rebuilt as React components.", topics:["Components","Props","State","Events","Lists and keys","Effects"]},
+  {can:"Build multi-page sites with routing, data loading and server code.", build:"A small real-estate site: project list, project pages and an enquiry form.", topics:["App Router","Server vs client components","Data fetching","Server actions","Metadata and SEO"]},
+  {can:"Style quickly with Tailwind and let clients edit content themselves.", build:"Project pages driven by a Sanity CMS.", topics:["Tailwind utilities","Responsive classes","Headless CMS","Content schemas","Live preview"]},
+  {can:"Run a live site: domains, security, speed and search.", build:"A full audit and fix list for your own site.", topics:["DNS and domains","SSL","Security headers","Core Web Vitals","Schema and sitemaps","Backups"]},
+  {can:"Plan, build and launch a client-style site alone.", build:"A complete real-estate site, from plan to deploy.", topics:["Planning","Building","Testing","Launch","Handover notes"]},
+];
+const LATER_INFO = {
+  "TypeScript":"Catch bugs before your code runs by adding types.",
+  "Testing":"Write automated tests so new changes don't break old features.",
+  "Authentication + user roles":"Add logins, sessions and user roles safely.",
+  "Databases in depth + an ORM":"Design proper database tables and query them efficiently.",
+  "APIs, webhooks, payments":"Build reliable APIs, receive webhooks and take payments.",
+  "Accessibility":"Build sites everyone can use, including keyboard and screen-reader users.",
+  "Performance + caching":"Make sites fast with caching, image optimisation and smaller bundles.",
+  "PHP + WordPress development":"Build custom WordPress themes and plugins.",
+  "DevOps: Linux, Docker, CI/CD":"Run your own Linux servers and containers, with deploys that happen automatically.",
+  "Cloud: storage, functions, CDNs":"Use cloud storage, serverless functions and CDNs.",
+  "App architecture + background jobs":"Structure large apps and run work in the background.",
+  "Realtime with WebSockets":"Build live features like chat and instant updates.",
+  "Security in depth (OWASP Top 10)":"Find and fix the most common attacks on web apps.",
+  "Mobile with React Native":"Build phone apps with the React skills you already have.",
+  "AI features with LLM APIs":"Add AI features to sites using LLM APIs.",
+  "System design + scaling":"Design systems that keep working with many users.",
+};
+
+const ALL_DRILLS = DAYS.flatMap(d=>d.drills);
+const KEY = "fsgym-v1";
+let state = {done:{}, code:{}, quiz:{}, notes:{}, finished:{}, active:{}, hints:0};
+let drafts = {};
+let curDay = 0;
+try{ const s = JSON.parse(localStorage.getItem(KEY)||"null"); if(s) state = Object.assign(state, s); }catch(e){}
+try{ drafts = JSON.parse(localStorage.getItem(KEY+"-drafts")||"{}"); }catch(e){}
+try{ const h = +localStorage.getItem(KEY+"-day"); if(h>=0 && h<DAYS.length) curDay = h; }catch(e){}
+
+const today = () => { const t=new Date(); return t.getFullYear()+"-"+String(t.getMonth()+1).padStart(2,"0")+"-"+String(t.getDate()).padStart(2,"0"); };
+function xp(){ return Object.keys(state.done).length*30 + Object.values(state.quiz).filter(q=>q.first).length*10 + Object.keys(state.finished).length*50; }
+function streak(){
+  let n=0; const d=new Date();
+  const key = x => x.getFullYear()+"-"+String(x.getMonth()+1).padStart(2,"0")+"-"+String(x.getDate()).padStart(2,"0");
+  if(!state.active[key(d)]) d.setDate(d.getDate()-1);
+  while(state.active[key(d)]){ n++; d.setDate(d.getDate()-1); }
+  return n;
+}
+const PER_LEVEL = 150;
+let lastLevel = null;
+function stats(){
+  const x = xp(), lvl = Math.floor(x/PER_LEVEL)+1;
+  document.getElementById("sLvl").textContent = lvl;
+  document.getElementById("sXp").textContent = x % PER_LEVEL;
+  document.getElementById("sNext").textContent = PER_LEVEL;
+  document.getElementById("sFill").style.width = ((x % PER_LEVEL)/PER_LEVEL*100)+"%";
+  document.getElementById("lvlRing").style.setProperty("--p", (x % PER_LEVEL)/PER_LEVEL*100);
+  document.getElementById("sStreak").textContent = streak();
+  document.getElementById("sDrills").textContent = ALL_DRILLS.filter(d=>state.done[d.id]).length+"/"+ALL_DRILLS.length;
+  if(lastLevel!==null && lvl>lastLevel) toast("Level "+lvl, "Level up. Keep going.", true);
+  lastLevel = lvl;
+}
+let toastTimer = null;
+function toast(big, small, level){
+  const t = document.getElementById("toast");
+  t.querySelector("b").textContent = big; t.querySelector("span").textContent = small;
+  t.classList.toggle("level", !!level); t.classList.add("show");
+  clearTimeout(toastTimer); toastTimer = setTimeout(()=>t.classList.remove("show"), level?2600:1800);
+}
+function pop(text, from){
+  const r = from.getBoundingClientRect();
+  const p = el("div",{class:"pop",style:"left:"+(r.left+r.width/2-16)+"px;top:"+(r.top-8)+"px"}, text);
+  document.body.append(p); setTimeout(()=>p.remove(), 1000);
+}
+
+/* saving: browser always, account store when the viewer provides one */
+let store = null, saveTimer = null, saving = false, again = false;
+function touch(){ state.active[today()] = true; }
+function save(){
+  try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){}
+  stats();
+  if(!store) return;
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(flush, 1500);
+}
+async function flush(){
+  if(saving){ again = true; return; }
+  saving = true;
+  try{ await store.set(Object.assign({}, state, {xp:xp(), updated:new Date().toISOString()})); setSync("Saved to your account · Claude can review it"); }
+  catch(e){ setSync("Couldn't save to your account. Progress is still kept in this browser."); }
+  saving = false;
+  if(again){ again = false; flush(); }
+}
+function setSync(t){ document.getElementById("sync").textContent = t; }
+function saveDrafts(){ try{ localStorage.setItem(KEY+"-drafts", JSON.stringify(drafts)); }catch(e){} }
+
+const CFG = window.GYM_CONFIG || {};
+const sb = (CFG.supabaseUrl && CFG.supabaseAnonKey && window.supabase) ? window.supabase.createClient(CFG.supabaseUrl, CFG.supabaseAnonKey) : null;
+let user = null;
+
+function mergeRemote(r){
+  if(!r) return;
+  for(const k of ["done","quiz","finished","active"]) state[k] = Object.assign({}, r[k]||{}, state[k]);
+  state.code = Object.assign({}, r.code||{}, state.code);
+  for(const [k,v] of Object.entries(r.notes||{})) if(!state.notes[k]) state.notes[k] = v;
+  state.hints = Math.max(state.hints||0, r.hints||0);
+}
+async function onSession(session){
+  user = session && session.user || null;
+  renderAuth();
+  if(!user){ store = null; setSync(sb ? "Saved in this browser only · sign in to sync" : "Progress saves in this browser"); return; }
+  store = {
+    async get(){
+      const { data, error } = await sb.from("progress").select("data").eq("user_id", user.id).maybeSingle();
+      if(error) throw error;
+      return data ? data.data : null;
+    },
+    async set(obj){
+      const { error } = await sb.from("progress").upsert({ user_id: user.id, data: obj, updated_at: new Date().toISOString() });
+      if(error) throw error;
+    }
+  };
+  try{
+    mergeRemote(await store.get());
+    setSync("Synced to your account");
+    render(); save();
+  }catch(e){ setSync("Couldn't reach your account. Progress is kept in this browser."); }
+}
+async function initStore(){
+  if(!sb){ setSync("Progress saves in this browser"); return; }
+  const { data } = await sb.auth.getSession();
+  sb.auth.onAuthStateChange((event, session)=>{ if(event==="SIGNED_IN" || event==="SIGNED_OUT") onSession(session); });
+  onSession(data.session);
+}
+
+function renderAuth(){
+  const box = document.getElementById("auth");
+  box.hidden = !sb; box.textContent = "";
+  if(!sb) return;
+  if(user){
+    box.append(el("div",{}, el("b",{},"Signed in"), el("p",{class:"msg"}, user.email+" · progress syncs to every device you sign in on")),
+      el("button",{class:"btn ghost",onclick:async()=>{ await sb.auth.signOut(); }},"Sign out"));
+    return;
+  }
+  const email = el("input",{type:"email",id:"authEmail",autocomplete:"email",placeholder:"you@example.com",required:true});
+  const pass = el("input",{type:"password",id:"authPass",autocomplete:"current-password",placeholder:"Password (8+ characters)",minlength:"8",required:true});
+  const msg = el("p",{class:"msg","aria-live":"polite"});
+  const go = async (mode)=>{
+    if(!email.value || pass.value.length<8){ msg.textContent = "Enter your email and a password of at least 8 characters."; return; }
+    msg.textContent = mode==="up" ? "Creating your account…" : "Signing in…";
+    const res = mode==="up"
+      ? await sb.auth.signUp({ email: email.value, password: pass.value })
+      : await sb.auth.signInWithPassword({ email: email.value, password: pass.value });
+    if(res.error){ msg.textContent = res.error.message; return; }
+    if(mode==="up" && !res.data.session){ msg.textContent = "Check your inbox and click the confirmation link, then sign in here."; return; }
+    msg.textContent = "";
+  };
+  const form = el("form",{class:"auth-form",onsubmit:e=>{ e.preventDefault(); go("in"); }},
+    el("label",{for:"authEmail"},"Email"), email, el("label",{for:"authPass"},"Password"), pass,
+    el("div",{class:"actions"}, el("button",{class:"btn primary",type:"submit"},"Sign in"), el("button",{class:"btn",type:"button",onclick:()=>go("up")},"Create account")));
+  box.append(el("div",{}, el("b",{},"Save your progress across devices"), el("p",{class:"msg"},"Sign in so your laptop and phone stay in sync. You can also keep going without an account; progress then stays in this browser."), msg), form);
+}
+
+document.getElementById("exportBtn").addEventListener("click", async ()=>{
+  const out = JSON.stringify({ exported: new Date().toISOString(), xp: xp(), progress: state }, null, 1);
+  const box = document.getElementById("exportBox"), msg = document.getElementById("exportMsg");
+  box.value = out; box.hidden = false;
+  try{ await navigator.clipboard.writeText(out); msg.textContent = "Copied. Paste it into your chat with Claude."; }
+  catch(e){ box.select(); msg.textContent = "Select all the text below and copy it."; }
+});
+
+/* rendering */
+function el(tag, attrs={}, ...kids){
+  const n = document.createElement(tag);
+  for(const [k,v] of Object.entries(attrs)){
+    if(k==="class") n.className=v; else if(k==="html") n.innerHTML=v; else if(k.startsWith("on")) n.addEventListener(k.slice(2), v); else if(v!==false && v!=null) n.setAttribute(k, v===true?"":v);
+  }
+  for(const c of kids.flat(Infinity)) if(c!=null) n.append(c.nodeType?c:document.createTextNode(c));
+  return n;
+}
+let openTile = null;
+function renderMap(){
+  const map = document.getElementById("map"); map.textContent="";
+  STAGES.forEach((S,si)=>{
+    const ol = el("ol",{class:"n"+S.items.length});
+    const detail = el("div",{class:"map-detail frame",hidden:true});
+    S.items.forEach(([tag,t,on],ii)=>{
+      const key = si+"-"+ii;
+      const btn = el("button",{class:"tile"+(on?" on":""),"aria-expanded":String(openTile===key),onclick:()=>{ openTile = openTile===key ? null : key; renderMap(); }},
+        el("b",{}, tag+(on?" · now":" · locked")), t);
+      ol.append(el("li",{}, btn));
+      if(openTile===key){
+        detail.hidden = false;
+        const W = si===0 ? WEEK_INFO[ii] : null;
+        detail.append(el("h4",{}, t, el("span",{}, tag+(on?" · in progress":" · locked"))));
+        if(W){
+          detail.append(
+            el("div",{}, el("span",{class:"lbl"},"After this you can"), el("p",{}, W.can), el("span",{class:"lbl",style:"margin-top:12px"},"You'll build"), el("p",{}, W.build)),
+            el("div",{}, el("span",{class:"lbl"},"Topics"), el("div",{class:"chips"}, W.topics.map(x=>el("span",{},x)))));
+        } else {
+          detail.append(el("div",{}, el("span",{class:"lbl"},"After this you can"), el("p",{}, LATER_INFO[t] || "")));
+        }
+      }
+    });
+    map.append(el("section",{class:"stage"}, el("div",{class:"stage-name"}, el("b",{},S.name), el("span",{},S.when)), ol, detail));
+  });
+}
+const DIFF = ["Easy","Medium","Hard"];
+const QTAG = {recall:"Recall", read:"Read the code", bug:"Spot the bug"};
+function pips(n){ return el("span",{class:"pips","aria-label":"Difficulty: "+DIFF[n-1]}, [1,2,3].map(i=>el("i",{class:i<=n?"on":""})), el("em",{},DIFF[n-1])); }
+function dayDiff(i){ return [1,1,2,2,3][i] || 3; }
+function drillDiff(j,n){ return n===1 ? 3 : 1+Math.round(j*2/(n-1)); }
+function unlocked(i){ return i===0 || !!state.finished[i-1]; }
+function steps(i){
+  const D = DAYS[i];
+  const out = [{type:"intro"}], used = new Set();
+  if(D.lessons){
+    D.lessons.forEach((L,k)=>{
+      out.push({type:"lesson",k});
+      if(L.tryit) out.push({type:"try",k});
+      L.quiz.forEach((q,j)=>out.push({type:"lq",k,j}));
+    });
+    return out.concat(D.drills.map((d,k)=>({type:"drill",k}))).concat([{type:"debrief"}]);
+  }
+  D.brief.forEach((b,k)=>{
+    out.push({type:"brief",k});
+    D.quiz.forEach((q,qk)=>{ if(q.b===b.t){ out.push({type:"quiz",k:qk}); used.add(qk); } });
+  });
+  D.quiz.forEach((q,qk)=>{ if(!used.has(qk)) out.push({type:"quiz",k:qk}); });
+  return out
+    .concat(D.drills.map((d,k)=>({type:"drill",k})))
+    .concat([{type:"debrief"}]);
+}
+let view = "hub", step = 0, dir = 1;
+function getStep(i){ try{ return +localStorage.getItem(KEY+"-step-"+i) || 0; }catch(e){ return 0; } }
+function setStep(i,n){ try{ localStorage.setItem(KEY+"-step-"+i, n); }catch(e){} }
+
+function renderMissions(){
+  const box = document.getElementById("missions"); box.textContent="";
+  DAYS.forEach((D,i)=>{
+    const open = unlocked(i), fin = !!state.finished[i] && D.drills.every(d=>state.done[d.id]), boss = i===DAYS.length-1;
+    const cleared = D.drills.filter(d=>state.done[d.id]).length;
+    const reopened = !!state.finished[i] && !fin;
+    const started = (getStep(i)>0 && !fin) || reopened;
+    const status = reopened ? "New drills added · "+cleared+"/"+D.drills.length+" cleared" : !open ? "Locked · finish Mission "+String(i).padStart(2,"0")+" first" : fin ? "Complete" : started ? "In progress · "+cleared+"/"+D.drills.length+" drills" : "Ready";
+    box.append(el("article",{class:"mcard frame"+(open?"":" locked")+(fin?" fin":"")+(boss?" boss":"")},
+      el("div",{class:"mnum"}, String(i+1).padStart(2,"0")),
+      el("div",{class:"eyebrow"}, boss?"Boss mission":"Mission"),
+      el("h4",{}, D.title),
+      pips(dayDiff(i)),
+      el("p",{class:"mstatus"}, status),
+      el("button",{class:"btn"+(open&&!fin?" primary":""),disabled:!open,onclick:()=>openMission(i)}, !open?"Locked":fin?"Replay":started?"Continue":"Start")));
+  });
+}
+function openMission(i){
+  curDay = i; try{ localStorage.setItem(KEY+"-day",i); }catch(e){}
+  try{localStorage.setItem(KEY+"-view","mission");}catch(e){}
+  view = "mission"; dir = 1;
+  const S = steps(i), firstOpen = S.findIndex(x=>x.type==="drill" && !state.done[DAYS[i].drills[x.k].id]);
+  const allDone = firstOpen<0;
+  step = state.finished[i] ? (allDone ? 0 : firstOpen) : getStep(i);
+  render(); window.scrollTo({top:0});
+}
+function goHub(){ try{localStorage.setItem(KEY+"-view","hub");}catch(e){} view = "hub"; render(); window.scrollTo({top:0}); }
+function go(n){ dir = n>step?1:-1; step = n; setStep(curDay,n); renderMission(); window.scrollTo({top:0}); }
+
+function render(){
+  const inM = view==="mission";
+  document.body.classList.toggle("in-mission", inM);
+  document.getElementById("hub").hidden = inM;
+  document.getElementById("mission").hidden = !inM;
+  if(inM) renderMission(); else renderMissions();
+  stats();
+}
+
+function anatomy(){
+  return el("div",{class:"anatomy"},
+    el("div",{class:"an-grid"},
+      el("span",{class:"an open"},"<p>"), el("span",{class:"an content"},"3 BHK from ₹1.2 Cr"), el("span",{class:"an close"},"</p>"),
+      el("span",{class:"an-l"},"opening tag"), el("span",{class:"an-l"},"content"), el("span",{class:"an-l"},"closing tag")),
+    el("div",{class:"an-whole"},"All three together = one element"));
+}
+function lessonCard(L){
+  return el("div",{class:"lesson frame"},
+    el("div",{class:"callout why"}, el("b",{},"Why this matters"), L.why),
+    L.body.map(t=>el("p",{class:"brief-body"},t)),
+    L.diagram==="element" ? anatomy() : null,
+    el("div",{class:"annot"}, el("div",{class:"annot-h"},"Example, line by line"),
+      L.ex.map(([c,n])=>el("div",{class:"annot-row"}, el("code",{class:"annot-code"}, c||" "), el("span",{class:"annot-note"}, n||"")))),
+    el("div",{class:"callouts"},
+      el("div",{class:"callout warn"}, el("b",{},"Common mistake"), L.bad),
+      el("div",{class:"callout work"}, el("b",{},"Where you've seen it"), L.work)));
+}
+function renderMission(){
+  const D = DAYS[curDay], S = steps(curDay), root = document.getElementById("mission"), boss = curDay===DAYS.length-1;
+  if(step>=S.length) step = S.length-1;
+  root.textContent = ""; root.classList.toggle("is-boss", boss);
+  const st = S[step];
+  const bar = el("div",{class:"steps","aria-hidden":"true"}, S.map((_,i)=>el("i",{class:i<step?"done":i===step?"now":""})));
+  root.append(el("div",{class:"mission-bar"},
+    el("button",{class:"btn ghost",onclick:goHub},"◂ Base"),
+    el("span",{class:"eyebrow"}, "Mission "+String(curDay+1).padStart(2,"0")+" · step "+(step+1)+"/"+S.length),
+    bar,
+    GLOSSARY[curDay] ? el("details",{class:"terms"}, el("summary",{class:"btn"},"Terms"),
+      el("dl",{}, GLOSSARY[curDay].map(([k,v])=>[el("dt",{},k), el("dd",{},v)]))) : null));
+
+  let ok = true, nextLabel = "Next ▸", skip = null;
+  const next = el("button",{class:"btn primary",onclick:()=>go(step+1)}, nextLabel);
+  const setOk = v => { next.disabled = !v; };
+  const screen = el("section",{class:"screen"+(dir<0?" back":"")});
+
+  if(st.type==="intro"){
+    const nQ = D.quiz.length, nD = D.drills.length;
+    screen.append(el("div",{class:"intro frame"},
+      el("div",{class:"eyebrow blink"}, boss?"Warning · boss detected":"Incoming mission"),
+      el("div",{class:"mnum-big"}, String(curDay+1).padStart(2,"0")),
+      el("h2",{}, D.title),
+      el("p",{}, D.goal),
+      pips(dayDiff(curDay)),
+      D.lessons ? el("ul",{class:"loadout"}, el("li",{}, D.lessons.length+" lessons"), el("li",{}, D.lessons.filter(L=>L.tryit).length+" try-its"), el("li",{}, D.lessons.reduce((n,L)=>n+L.quiz.length,0)+" questions"), el("li",{}, nD+" drills, guided to hard"), el("li",{},"about 90 minutes")) : el("ul",{class:"loadout"}, el("li",{}, D.brief.length+" briefings"), el("li",{}, nQ+" question"+(nQ>1?"s":"")), el("li",{}, nD+" drill"+(nD>1?"s":"")+(nD>1?", easy to hard":"")), el("li",{},"about 60 minutes")),
+      el("button",{class:"btn primary big",onclick:()=>go(1)}, boss?"Start boss fight ▸":"Start mission ▸")));
+    root.append(screen); return;
+  }
+  if(st.type==="lesson"){
+    const L = D.lessons[st.k];
+    screen.append(el("div",{class:"screen-head"}, el("div",{class:"eyebrow"},"Lesson "+(st.k+1)+" of "+D.lessons.length), el("h2",{},L.t)), lessonCard(L));
+    const after = S[step+1];
+    next.textContent = after && after.type==="try" ? "Try it ▸" : after && after.type==="lq" ? "Check yourself ▸" : "Next ▸";
+  }
+  if(st.type==="try"){
+    const L = D.lessons[st.k];
+    screen.append(el("div",{class:"screen-head"}, el("div",{class:"eyebrow"},"Try it · Lesson "+(st.k+1)), el("h2",{},L.tryit.title)),
+      renderDrill(Object.assign({uses:[L.t]}, L.tryit), ()=>setOk(true)));
+    ok = !!state.done[L.tryit.id];
+  }
+  if(st.type==="lq"){
+    const L = D.lessons[st.k], q = L.quiz[st.j], id = "L"+curDay+"-"+st.k+"-"+st.j;
+    screen.append(el("div",{class:"screen-head"}, el("div",{class:"eyebrow"},"Lesson "+(st.k+1)+" check · question "+(st.j+1)+" of "+L.quiz.length),
+        el("div",{class:"qmeta"}, el("span",{class:"qtag "+q.t}, QTAG[q.t]), el("span",{class:"msg"},"Checks: "+L.t))),
+      el("div",{class:"solo"}, renderQuiz(q, id, ()=>setOk(true))));
+    ok = !!(state.quiz[id] && state.quiz[id].solved);
+  }
+  if(st.type==="brief"){
+    const B = D.brief[st.k];
+    screen.append(el("div",{class:"screen-head"}, el("div",{class:"eyebrow"},"Briefing "+(st.k+1)+" of "+D.brief.length), el("h2",{},B.t)),
+      el("div",{class:"brief frame"},
+        el("p",{class:"brief-body"}, B.body),
+        el("pre",{}, B.ex),
+        el("div",{class:"callouts"},
+          el("div",{class:"callout warn"}, el("b",{},"Common mistake"), B.bad),
+          el("div",{class:"callout work"}, el("b",{},"Where you've seen it"), B.work))));
+    const after = S[step+1];
+    next.textContent = after && after.type==="quiz" ? "Check yourself ▸" : after && after.type==="drill" ? "Start the drills ▸" : "Next idea ▸";
+  }
+  if(st.type==="quiz"){
+    const id = "q"+curDay+"-"+st.k;
+    screen.append(el("div",{class:"screen-head"}, el("div",{class:"eyebrow"},"Question "+(S.slice(0,step+1).filter(x=>x.type==="quiz").length)+" of "+D.quiz.length), el("div",{class:"qmeta"}, el("span",{class:"qtag "+D.quiz[st.k].t}, QTAG[D.quiz[st.k].t]), el("span",{class:"msg"},"Checks: "+D.quiz[st.k].b))),
+      el("div",{class:"solo"}, renderQuiz(D.quiz[st.k], id, ()=>setOk(true))));
+    ok = !!(state.quiz[id] && state.quiz[id].solved);
+  }
+  if(st.type==="drill"){
+    const dr = D.drills[st.k], n = D.drills.length;
+    screen.append(el("div",{class:"screen-head"}, el("div",{class:"eyebrow"}, boss?"Boss fight":"Drill "+(st.k+1)+" of "+n), pips(boss ? 3 : drillDiff(st.k,n))),
+      renderDrill(dr, ()=>{ setOk(true); if(skip) skip.remove(); }));
+    ok = !!state.done[dr.id];
+  }
+  if(st.type==="debrief"){
+    const cleared = D.drills.filter(d=>state.done[d.id]).length, allDone = cleared===D.drills.length;
+    const lq = D.lessons ? D.lessons.flatMap((L,k)=>L.quiz.map((q,j)=>"L"+curDay+"-"+k+"-"+j)) : D.quiz.map((q,k)=>"q"+curDay+"-"+k);
+    const firstTry = lq.filter(id=>state.quiz[id] && state.quiz[id].first).length;
+    const note = el("textarea",{id:"note-"+curDay,placeholder:"What was hard today? What clicked? Claude reads this in your weekly review."});
+    note.value = state.notes[curDay] || "";
+    note.addEventListener("input",()=>{ state.notes[curDay]=note.value; save(); });
+    const fin = state.finished[curDay] && allDone;
+    const nextM = curDay+1<DAYS.length ? curDay+1 : null;
+    screen.append(el("div",{class:"screen-head"}, el("div",{class:"eyebrow"},"Debrief"), el("h2",{}, fin?"Mission complete":"Mission report")),
+      el("div",{class:"report"},
+        el("div",{class:"stat frame cleared"}, el("b",{}, cleared+"/"+D.drills.length), el("span",{},"drills cleared")),
+        el("div",{class:"stat frame"}, el("b",{}, firstTry+"/"+lq.length), el("span",{},"first-try answers")),
+        el("div",{class:"stat frame streak"}, el("b",{}, String(streak())), el("span",{},"day streak"))),
+      el("div",{class:"wrapup frame"}, el("label",{for:"note-"+curDay},"Notes for your review"), note,
+        el("div",{class:"actions"},
+          fin ? el("button",{class:"btn primary",onclick:()=> nextM!==null ? openMission(nextM) : goHub()}, nextM!==null?"Next mission ▸":"Back to base")
+              : el("button",{class:"btn primary",disabled:!allDone,onclick:()=>{state.finished[curDay]=new Date().toISOString(); touch(); save(); toast("+50 XP","Mission "+(curDay+1)+" complete"); renderMission();}}, "Complete mission (+50 XP)"),
+          el("span",{class:"msg"}, allDone ? (fin?"Come back tomorrow to keep your streak.":"All drills cleared.") : "Clear every drill to complete the mission. Use Back to return to one you skipped."))));
+  }
+
+  const nav = el("div",{class:"nav-row"},
+    el("button",{class:"btn",disabled:step===0,onclick:()=>go(step-1)},"◂ Back"),
+    st.type==="drill" && !ok ? (skip = el("button",{class:"btn ghost",onclick:()=>go(step+1)},"Skip for now")) : null,
+    st.type==="debrief" ? null : next);
+  setOk(ok);
+  root.append(screen, nav);
+}
+
+function renderQuiz(Q, id, onSolve){
+  const rec = state.quiz[id];
+  const box = el("div",{class:"quiz frame"}, el("div",{class:"q"},Q.q), Q.code?el("pre",{},Q.code):null);
+  const opts = el("div",{class:"opts"});
+  const why = el("div",{class:"why",hidden:!rec||!rec.solved}, Q.why);
+  Q.opts.forEach((o,i)=>{
+    const b = el("button",{class:"opt","data-k":"ABCD"[i],onclick:()=>{
+      const fresh = !state.quiz[id];
+      const r = state.quiz[id] || (state.quiz[id] = {first:i===Q.a, tries:0});
+      r.tries++;
+      if(i===Q.a){ r.solved=true; if(fresh) pop("+10", b); b.classList.add("right"); [...opts.children].forEach(x=>x.disabled=true); why.hidden=false; onSolve && onSolve(); }
+      else { b.classList.add("wrong"); b.disabled=true; }
+      touch(); save();
+    }}, o);
+    if(rec && rec.solved){ b.disabled=true; if(i===Q.a) b.classList.add("right"); }
+    opts.append(b);
+  });
+  box.append(opts, why);
+  return box;
+}
+
+function renderDrill(dr, onPass){
+  const done = !!state.done[dr.id];
+  const cur = drafts[dr.id] || state.code[dr.id] || {html:dr.html, css:dr.css||""};
+  let file = "html";
+  const isBoss = !!dr.boss;
+  const card = el("article",{class:"drill frame"+(done?" done":"")+(isBoss?" boss":"")});
+  const hpFill = el("i",{style:"width:"+(done?0:100)+"%"});
+  const hp = isBoss ? el("div",{class:"boss-hp"}, el("span",{},"Boss HP"), el("div",{class:"bar"}, hpFill)) : null;
+  const ta = el("textarea",{spellcheck:"false","aria-label":dr.title+" code editor",autocapitalize:"off",autocomplete:"off"});
+  ta.value = cur.html;
+  const tabH = el("button",{class:"ftab","aria-selected":"true",onclick:()=>swap("html")},"index.html");
+  const tabC = el("button",{class:"ftab","aria-selected":"false",hidden:!(dr.css||dr.useCss),onclick:()=>swap("css")},"style.css");
+  function swap(f){ cur[file]=ta.value; file=f; ta.value=cur[f]; tabH.setAttribute("aria-selected",f==="html"); tabC.setAttribute("aria-selected",f==="css"); ta.focus(); }
+  const frame = el("iframe",{sandbox:"allow-same-origin",title:dr.title+" preview"});
+  const checks = el("ul",{class:"checks"}, dr.tests.map(([l])=>el("li",{},l)));
+  const hint = el("div",{class:"hint",hidden:true,"aria-live":"polite"});
+  const msg = el("span",{class:"msg"});
+
+  const doc = () => "<!doctype html><html><head><meta charset='utf-8'><style>body{font-family:system-ui,sans-serif;margin:16px;color:#111}"+"</style><style>"+cur.css+"</style></head><body>"+cur.html+"</body></html>";
+  function paint(){ return new Promise(res=>{ frame.onload=()=>res(); frame.srcdoc = doc(); }); }
+  let t=null;
+  ta.addEventListener("input",()=>{ cur[file]=ta.value; drafts[dr.id]={html:cur.html,css:cur.css}; clearTimeout(t); t=setTimeout(()=>{paint(); saveDrafts();},350); });
+  ta.addEventListener("keydown",e=>{
+    if(e.key==="Tab" && !e.shiftKey){ e.preventDefault(); const s=ta.selectionStart; ta.setRangeText("  ",s,ta.selectionEnd,"end"); ta.dispatchEvent(new Event("input")); }
+    if(e.key==="Enter" && (e.ctrlKey||e.metaKey)){ e.preventDefault(); check(); }
+  });
+
+  async function check(){
+    cur[file]=ta.value;
+    await paint();
+    const d = frame.contentDocument, w = frame.contentWindow;
+    const src = {html:cur.html, css:cur.css};
+    const res = dr.tests.map(([,fn])=>{ try{ return !!fn(d,w,src); }catch(e){ return false; } });
+    [...checks.children].forEach((li,i)=>{ li.className = res[i]?"pass":"fail"; });
+    touch();
+    const pass = res.every(Boolean);
+    if(isBoss) hpFill.style.width = (res.filter(x=>!x).length/res.length*100)+"%";
+    if(pass && !state.done[dr.id]) toast(isBoss?"Boss defeated":"+30 XP", isBoss?"+30 XP · Week 1 boss down":dr.title+" cleared");
+    if(pass){
+      const first = !state.done[dr.id];
+      state.done[dr.id] = state.done[dr.id] || new Date().toISOString();
+      state.code[dr.id] = {html:cur.html, css:cur.css};
+      card.classList.add("done"); badge.textContent="Cleared"; onPass && onPass();
+      msg.textContent = first ? "Passed. +30 XP" : "Still passing. Saved your latest version.";
+    } else {
+      msg.textContent = res.filter(Boolean).length+" of "+res.length+" checks pass. Read the red ones and try again.";
+    }
+    save();
+    return res;
+  }
+
+
+  const badge = el("span",{class:"badge"}, done?"Cleared":(isBoss?"Boss":"Drill"));
+  card.append(
+    el("div",{class:"drill-head"}, el("h4",{}, dr.title, badge), el("p",{}, dr.brief), hp,
+      (dr.uses||[]).length ? el("details",{class:"refresh"}, el("summary",{},"Refresher: "+dr.uses.join(", ")),
+        dr.uses.map(t=>BRIEFS[t]).filter(Boolean).map(b=>el("div",{class:"refresh-item"}, el("b",{},b.t), el("p",{},b.body), el("pre",{},b.ex)))) : null),
+    el("div",{class:"drill-body"},
+      el("div",{class:"editor"}, el("div",{class:"ftabs"},tabH,tabC), ta),
+      el("div",{class:"preview"}, el("div",{class:"eyebrow"},"Preview"), frame)),
+    el("div",{class:"drill-foot"}, checks,
+      el("div",{class:"actions"},
+        el("button",{class:"btn primary",onclick:check}, isBoss?"Attack (Check)":"Check"),
+        el("button",{class:"btn",onclick:()=>{ cur.html=dr.html; cur.css=dr.css||""; ta.value=cur[file]; delete drafts[dr.id]; saveDrafts(); paint(); [...checks.children].forEach(li=>li.className=""); msg.textContent="Back to the starter code."; }},"Reset"),
+        msg), hint));
+  paint();
+  return card;
+}
+
+function askRestart(){
+  const box = document.getElementById("restartBox"); box.textContent = "";
+  box.append(el("span",{class:"msg"},"This can't be undone."),
+    el("button",{class:"btn danger",onclick:doRestart},"Yes, wipe everything"),
+    el("button",{class:"btn ghost",onclick:()=>{ box.textContent=""; box.append(el("button",{class:"btn",id:"restartBtn",onclick:askRestart},"Reset all progress")); }},"Cancel"));
+}
+function doRestart(){
+  state = {done:{}, code:{}, quiz:{}, notes:{}, finished:{}, active:{}, hints:0};
+  drafts = {}; saveDrafts();
+  try{ for(let i=0;i<DAYS.length;i++) localStorage.removeItem(KEY+"-step-"+i); localStorage.removeItem(KEY+"-view"); }catch(e){}
+  lastLevel = null; view = "hub"; save(); render(); renderMap();
+  const box = document.getElementById("restartBox"); box.textContent = "";
+  box.append(el("button",{class:"btn",id:"restartBtn",onclick:askRestart},"Reset all progress"));
+  toast("Fresh start","Begin with Mission 01"); window.scrollTo({top:0});
+}
+document.getElementById("restartBtn").addEventListener("click", askRestart);
+
+
+renderMap(); render();
+try{ if(localStorage.getItem(KEY+"-view")==="mission"){ openMission(curDay); } }catch(e){}
+initStore();
+</script>
+</body>
+</html>
