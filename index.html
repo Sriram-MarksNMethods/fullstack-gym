@@ -1258,7 +1258,7 @@ function renderAuth(){
     if(!email.value || pass.value.length<8){ msg.textContent = "Enter your email and a password of at least 8 characters."; return; }
     msg.textContent = mode==="up" ? "Creating your account…" : "Signing in…";
     const res = mode==="up"
-      ? await sb.auth.signUp({ email: email.value, password: pass.value })
+      ? await sb.auth.signUp({ email: email.value, password: pass.value, options: { emailRedirectTo: location.origin + location.pathname } })
       : await sb.auth.signInWithPassword({ email: email.value, password: pass.value });
     if(res.error){ msg.textContent = res.error.message; return; }
     if(mode==="up" && !res.data.session){ msg.textContent = "Check your inbox and click the confirmation link, then sign in here."; return; }
